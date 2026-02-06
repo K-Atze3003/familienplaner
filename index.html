@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>FamilyHub</title>
+    <title>FamilyHub Pro</title>
     <style>
         :root {
             --bg-color: #f0f2f5;
             --primary-blue: #007aff;
             --success-green: #34c759;
             --danger-red: #ff3b30;
+            --fav-yellow: #ffcc00;
             --tab-bar-bg: rgba(255, 255, 255, 0.8);
         }
 
@@ -20,7 +21,6 @@
             background-color: var(--bg-color);
             margin: 0;
             padding-bottom: 90px;
-            -webkit-user-select: none;
         }
 
         section { display: none; padding: 20px; animation: fadeIn 0.3s ease; }
@@ -36,18 +36,24 @@
         .card { background: white; border-radius: 20px; height: 130px; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 3px solid transparent; transition: 0.2s; -webkit-tap-highlight-color: transparent; }
         .card.done { background: var(--success-green); color: white; transform: scale(0.95); }
         .card .icon { font-size: 40px; margin-bottom: 5px; }
-        .card .label { font-size: 14px; font-weight: 600; }
 
-        /* KONTAKTE STYLE & FORM */
-        .input-group { background: white; width: 100%; padding: 15px; border-radius: 15px; margin-bottom: 20px; box-sizing: border-box; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        input { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #d1d1d6; border-radius: 10px; font-size: 16px; box-sizing: border-box; }
+        /* KONTAKTE FORM & CARDS */
+        .input-group { background: white; width: 100%; padding: 15px; border-radius: 20px; margin-bottom: 20px; box-sizing: border-box; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        input, select { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #d1d1d6; border-radius: 10px; font-size: 16px; box-sizing: border-box; }
         .add-btn { width: 100%; background: var(--primary-blue); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; margin-top: 10px; }
         
-        .contact-card { background: white; width: 100%; padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; }
+        .contact-card { background: white; width: 100%; padding: 15px; border-radius: 20px; margin-bottom: 12px; box-sizing: border-box; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: 0.3s; }
+        .contact-main { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         .contact-info { display: flex; flex-direction: column; }
-        .contact-actions { display: flex; align-items: center; gap: 10px; }
-        .call-btn { background: var(--success-green); color: white; padding: 8px 15px; border-radius: 20px; text-decoration: none; font-weight: bold; font-size: 14px; }
-        .del-btn { color: var(--danger-red); background: none; border: none; font-size: 18px; padding: 5px; }
+        .contact-actions { display: flex; align-items: center; gap: 12px; }
+        
+        .contact-details { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee; font-size: 14px; color: #666; line-height: 1.6; }
+        .contact-details.show { display: block; }
+        
+        .call-btn { background: var(--success-green); color: white; padding: 8px 15px; border-radius: 20px; text-decoration: none; font-weight: bold; font-size: 13px; }
+        .fav-btn { color: #ccc; background: none; border: none; font-size: 20px; }
+        .fav-btn.active { color: var(--fav-yellow); }
+        .del-btn { color: var(--danger-red); background: none; border: none; font-size: 16px; margin-left: 5px;}
 
         /* TAB BAR */
         .tab-bar { position: fixed; bottom: 0; width: 100%; height: 75px; background: var(--tab-bar-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; justify-content: space-around; align-items: center; border-top: 0.5px solid #d1d1d6; padding-bottom: env(safe-area-inset-bottom); }
@@ -77,20 +83,20 @@
 
     <section id="calendar">
         <h1>Kalender 📅</h1>
-        <div class="contact-card">
-            <div><strong>Morgen:</strong> Restmüll 🗑️</div>
-        </div>
+        <div id="birthdayList" style="width: 100%;"></div>
+        <div class="contact-card"><div><strong>Morgen:</strong> Restmüll 🗑️</div></div>
     </section>
 
     <section id="contacts">
         <h1>Kontakte 📞</h1>
-        
         <div class="input-group">
             <input type="text" id="contactName" placeholder="Name">
             <input type="tel" id="contactPhone" placeholder="Telefonnummer">
-            <button class="add-btn" onclick="saveNewContact()">Hinzufügen</button>
+            <input type="text" id="contactRelation" placeholder="Beziehung (z.B. Familie, Arzt)">
+            <input type="date" id="contactBday" placeholder="Geburtstag">
+            <input type="text" id="contactAddress" placeholder="Adresse">
+            <button class="add-btn" onclick="saveNewContact()">Kontakt hinzufügen</button>
         </div>
-
         <div id="contactsList" style="width: 100%;"></div>
     </section>
 
@@ -112,23 +118,17 @@
             document.getElementById(tabId).classList.add('active');
             document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
             element.classList.add('active');
+            if(tabId === 'calendar') renderBirthdays();
         }
 
-        // INITIALISIERUNG BEIM LADEN
         window.onload = function() {
-            // Routine laden
             const savedRoutine = JSON.parse(localStorage.getItem('routineState')) || [false, false, false, false, false, false];
             const cards = document.querySelectorAll('#routine .card');
-            cards.forEach((card, index) => { 
-                if (savedRoutine[index]) card.classList.add('done'); 
-            });
+            cards.forEach((card, index) => { if (savedRoutine[index]) card.classList.add('done'); });
             updateProgress();
-
-            // Kontakte laden
             renderContacts();
         };
 
-        // --- ROUTINE LOGIK ---
         function toggleTask(element, index) {
             element.classList.toggle('done');
             const cards = document.querySelectorAll('#routine .card');
@@ -152,41 +152,83 @@
         function saveNewContact() {
             const name = document.getElementById('contactName').value;
             const phone = document.getElementById('contactPhone').value;
+            const relation = document.getElementById('contactRelation').value;
+            const bday = document.getElementById('contactBday').value;
+            const addr = document.getElementById('contactAddress').value;
 
             if (name && phone) {
                 let contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
-                contacts.push({ name, phone });
+                contacts.push({ name, phone, relation, bday, addr, fav: false, id: Date.now() });
                 localStorage.setItem('familyContacts', JSON.stringify(contacts));
-                
-                document.getElementById('contactName').value = '';
-                document.getElementById('contactPhone').value = '';
+                ["contactName", "contactPhone", "contactRelation", "contactBday", "contactAddress"].forEach(id => document.getElementById(id).value = '');
                 renderContacts();
             }
         }
 
-        function deleteContact(index) {
+        function toggleFav(id) {
             let contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
-            contacts.splice(index, 1);
+            const index = contacts.findIndex(c => c.id === id);
+            contacts[index].fav = !contacts[index].fav;
             localStorage.setItem('familyContacts', JSON.stringify(contacts));
             renderContacts();
         }
 
+        function deleteContact(id) {
+            if(!confirm("Löschen?")) return;
+            let contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
+            contacts = contacts.filter(c => c.id !== id);
+            localStorage.setItem('familyContacts', JSON.stringify(contacts));
+            renderContacts();
+        }
+
+        function toggleDetails(id) {
+            document.getElementById('details-' + id).classList.toggle('show');
+        }
+
         function renderContacts() {
             const list = document.getElementById('contactsList');
-            const contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
+            let contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
+            
+            // Sortierung: Favoriten zuerst
+            contacts.sort((a, b) => (b.fav === a.fav) ? 0 : b.fav ? 1 : -1);
+            
             list.innerHTML = '';
-
-            contacts.forEach((c, index) => {
+            contacts.forEach((c) => {
                 list.innerHTML += `
                     <div class="contact-card">
-                        <div class="contact-info">
-                            <strong>${c.name}</strong>
-                            <small>${c.phone}</small>
+                        <div class="contact-main">
+                            <div class="contact-info" onclick="toggleDetails(${c.id})">
+                                <strong>${c.fav ? '⭐ ' : ''}${c.name}</strong>
+                                <small>${c.relation || 'Kontakt'}</small>
+                            </div>
+                            <div class="contact-actions">
+                                <a href="tel:${c.phone}" class="call-btn"><i class="fas fa-phone"></i></a>
+                                <button class="fav-btn ${c.fav ? 'active' : ''}" onclick="toggleFav(${c.id})"><i class="fas fa-star"></i></button>
+                                <button class="del-btn" onclick="deleteContact(${c.id})"><i class="fas fa-trash"></i></button>
+                            </div>
                         </div>
-                        <div class="contact-actions">
-                            <a href="tel:${c.phone}" class="call-btn">Anrufen</a>
-                            <button class="del-btn" onclick="deleteContact(${index})"><i class="fas fa-trash"></i></button>
+                        <div id="details-${c.id}" class="contact-details">
+                            <p><strong>Telefon:</strong> ${c.phone}</p>
+                            ${c.bday ? `<p><strong>Geburtstag:</strong> ${new Date(c.bday).toLocaleDateString('de-DE')}</p>` : ''}
+                            ${c.addr ? `<p><strong>Adresse:</strong> ${c.addr}</p>` : ''}
                         </div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderBirthdays() {
+            const bdayContainer = document.getElementById('birthdayList');
+            const contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
+            const upcoming = contacts.filter(c => c.bday);
+            
+            bdayContainer.innerHTML = '<h3>Geburtstage 🎂</h3>';
+            if(upcoming.length === 0) bdayContainer.innerHTML += '<p>Keine Geburtstage hinterlegt.</p>';
+            
+            upcoming.forEach(c => {
+                bdayContainer.innerHTML += `
+                    <div class="contact-card">
+                        <div><strong>${c.name}</strong><br><small>Geburtstag am: ${new Date(c.bday).toLocaleDateString('de-DE')}</small></div>
                     </div>
                 `;
             });
