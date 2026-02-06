@@ -11,6 +11,7 @@
             --bg-color: #f0f2f5;
             --primary-blue: #007aff;
             --success-green: #34c759;
+            --danger-red: #ff3b30;
             --tab-bar-bg: rgba(255, 255, 255, 0.8);
         }
 
@@ -18,87 +19,43 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-color);
             margin: 0;
-            padding-bottom: 80px; /* Platz für Tab-Bar */
+            padding-bottom: 90px;
             -webkit-user-select: none;
         }
 
-        /* Navigations-Logik: Bereiche verstecken */
-        section {
-            display: none;
-            padding: 20px;
-            animation: fadeIn 0.3s ease;
-        }
-
-        section.active {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; } to { opacity: 1; }
-        }
+        section { display: none; padding: 20px; animation: fadeIn 0.3s ease; }
+        section.active { display: flex; flex-direction: column; align-items: center; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         h1 { margin-top: 40px; font-size: 28px; color: #1c1c1e; }
 
-        /* --- STYLES AUS DER ROUTINE --- */
+        /* ROUTINE STYLE */
         .progress-container { width: 90%; height: 15px; background: #e5e5ea; border-radius: 10px; margin: 20px 0; overflow: hidden; }
         #progress-bar { width: 0%; height: 100%; background: var(--primary-blue); transition: width 0.4s; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
-        .card { background: white; border-radius: 20px; height: 140px; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 3px solid transparent; transition: 0.2s; }
+        .card { background: white; border-radius: 20px; height: 130px; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 3px solid transparent; transition: 0.2s; -webkit-tap-highlight-color: transparent; }
         .card.done { background: var(--success-green); color: white; transform: scale(0.95); }
-        .card .icon { font-size: 40px; }
+        .card .icon { font-size: 40px; margin-bottom: 5px; }
+        .card .label { font-size: 14px; font-weight: 600; }
 
-        /* --- TAB BAR STYLE --- */
-        .tab-bar {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            height: 70px;
-            background: var(--tab-bar-bg);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            border-top: 0.5px solid #d1d1d6;
-            padding-bottom: env(safe-area-inset-bottom);
-        }
+        /* KONTAKTE STYLE & FORM */
+        .input-group { background: white; width: 100%; padding: 15px; border-radius: 15px; margin-bottom: 20px; box-sizing: border-box; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        input { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #d1d1d6; border-radius: 10px; font-size: 16px; box-sizing: border-box; }
+        .add-btn { width: 100%; background: var(--primary-blue); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; margin-top: 10px; }
+        
+        .contact-card { background: white; width: 100%; padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; }
+        .contact-info { display: flex; flex-direction: column; }
+        .contact-actions { display: flex; align-items: center; gap: 10px; }
+        .call-btn { background: var(--success-green); color: white; padding: 8px 15px; border-radius: 20px; text-decoration: none; font-weight: bold; font-size: 14px; }
+        .del-btn { color: var(--danger-red); background: none; border: none; font-size: 18px; padding: 5px; }
 
-        .tab-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: #8e8e93;
-            font-size: 10px;
-            text-decoration: none;
-            width: 25%;
-        }
-
+        /* TAB BAR */
+        .tab-bar { position: fixed; bottom: 0; width: 100%; height: 75px; background: var(--tab-bar-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; justify-content: space-around; align-items: center; border-top: 0.5px solid #d1d1d6; padding-bottom: env(safe-area-inset-bottom); }
+        .tab-item { display: flex; flex-direction: column; align-items: center; color: #8e8e93; font-size: 10px; text-decoration: none; width: 33%; }
         .tab-item.active { color: var(--primary-blue); }
-        .tab-item i { font-size: 24px; margin-bottom: 4px; }
+        .tab-item i { font-size: 22px; margin-bottom: 4px; }
 
-        /* --- NEU: KONTAKTE STYLE --- */
-        .contact-card {
-            background: white;
-            width: 100%;
-            padding: 15px;
-            border-radius: 15px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .call-btn {
-            background: var(--success-green);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 20px;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        #confetti { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 80px; display: none; }
+        #confetti { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 80px; display: none; z-index: 100; pointer-events: none; }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -107,52 +64,34 @@
     <section id="routine" class="active">
         <h1>Routine 🌙</h1>
         <div class="progress-container"><div id="progress-bar"></div></div>
-         <div class="grid">
-        <div class="card" onclick="toggleTask(this, 0)">
-            <span class="icon">🍎</span>
-            <span class="label">Abendessen</span>
-        </div>
-        <div class="card" onclick="toggleTask(this, 1)">
-            <span class="icon">🧸</span>
-            <span class="label">Aufräumen</span>
-        </div>
-        <div class="card" onclick="toggleTask(this, 2)">
-            <span class="icon">🪥</span>
-            <span class="label">Zähneputzen</span>
-        </div>
-        <div class="card" onclick="toggleTask(this, 3)">
-            <span class="icon">👚</span>
-            <span class="label">Schlafanzug</span>
-        </div>
-        <div class="card" onclick="toggleTask(this, 4)">
-            <span class="icon">🧺</span>
-            <span class="label">Wäschesack</span>
-        </div>    
-        <div class="card" onclick="toggleTask(this, 5)">
-            <span class="icon">🪮</span>
-            <span class="label">Haarekämmen</span>
+        <div class="grid">
+            <div class="card" onclick="toggleTask(this, 0)"><span class="icon">🍎</span><span class="label">Abendessen</span></div>
+            <div class="card" onclick="toggleTask(this, 1)"><span class="icon">🧸</span><span class="label">Aufräumen</span></div>
+            <div class="card" onclick="toggleTask(this, 2)"><span class="icon">🪥</span><span class="label">Zähneputzen</span></div>
+            <div class="card" onclick="toggleTask(this, 3)"><span class="icon">👚</span><span class="label">Schlafanzug</span></div>
+            <div class="card" onclick="toggleTask(this, 4)"><span class="icon">🧺</span><span class="label">Wäschesack</span></div>    
+            <div class="card" onclick="toggleTask(this, 5)"><span class="icon">🪮</span><span class="label">Haarekämmen</span></div>
         </div>
         <div id="confetti">🎉</div>
     </section>
 
     <section id="calendar">
         <h1>Kalender 📅</h1>
-        <p>Hier kommt bald der Müll-Planer hin.</p>
         <div class="contact-card">
             <div><strong>Morgen:</strong> Restmüll 🗑️</div>
         </div>
     </section>
 
     <section id="contacts">
-        <h1>Notfall-Kontakte 📞</h1>
-        <div class="contact-card">
-            <div><strong>Mama</strong><br><small>0170 1234567</small></div>
-            <a href="tel:01701234567" class="call-btn">Anrufen</a>
+        <h1>Kontakte 📞</h1>
+        
+        <div class="input-group">
+            <input type="text" id="contactName" placeholder="Name">
+            <input type="tel" id="contactPhone" placeholder="Telefonnummer">
+            <button class="add-btn" onclick="saveNewContact()">Hinzufügen</button>
         </div>
-        <div class="contact-card">
-            <div><strong>Papa</strong><br><small>0170 7654321</small></div>
-            <a href="tel:01707654321" class="call-btn">Anrufen</a>
-        </div>
+
+        <div id="contactsList" style="width: 100%;"></div>
     </section>
 
     <nav class="tab-bar">
@@ -168,26 +107,28 @@
     </nav>
 
     <script>
-        // NAVIGATION LOGIK
         function showTab(tabId, element) {
-            // Alle Sektionen verstecken
             document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
-            // Gewählte Sektion zeigen
             document.getElementById(tabId).classList.add('active');
-            
-            // Tab-Bar Icons updaten
             document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
             element.classList.add('active');
         }
 
-        // ROUTINE LOGIK (aus der vorherigen Version)
+        // INITIALISIERUNG BEIM LADEN
         window.onload = function() {
-            const savedState = JSON.parse(localStorage.getItem('routineState')) || [false, false, false, false];
+            // Routine laden
+            const savedRoutine = JSON.parse(localStorage.getItem('routineState')) || [false, false, false, false, false, false];
             const cards = document.querySelectorAll('#routine .card');
-            cards.forEach((card, index) => { if (savedState[index]) card.classList.add('done'); });
+            cards.forEach((card, index) => { 
+                if (savedRoutine[index]) card.classList.add('done'); 
+            });
             updateProgress();
+
+            // Kontakte laden
+            renderContacts();
         };
 
+        // --- ROUTINE LOGIK ---
         function toggleTask(element, index) {
             element.classList.toggle('done');
             const cards = document.querySelectorAll('#routine .card');
@@ -198,15 +139,58 @@
         }
 
         function updateProgress() {
-            const total = document.querySelectorAll('#routine .card').length;
+            const cards = document.querySelectorAll('#routine .card');
             const done = document.querySelectorAll('#routine .card.done').length;
-            document.getElementById('progress-bar').style.width = (done/total*100) + '%';
-            if (done === total) {
+            document.getElementById('progress-bar').style.width = (done/cards.length*100) + '%';
+            if (done === cards.length && done > 0) {
                 document.getElementById('confetti').style.display = 'block';
                 setTimeout(() => { document.getElementById('confetti').style.display = 'none'; }, 3000);
             }
         }
+
+        // --- KONTAKTE LOGIK ---
+        function saveNewContact() {
+            const name = document.getElementById('contactName').value;
+            const phone = document.getElementById('contactPhone').value;
+
+            if (name && phone) {
+                let contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
+                contacts.push({ name, phone });
+                localStorage.setItem('familyContacts', JSON.stringify(contacts));
+                
+                document.getElementById('contactName').value = '';
+                document.getElementById('contactPhone').value = '';
+                renderContacts();
+            }
+        }
+
+        function deleteContact(index) {
+            let contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
+            contacts.splice(index, 1);
+            localStorage.setItem('familyContacts', JSON.stringify(contacts));
+            renderContacts();
+        }
+
+        function renderContacts() {
+            const list = document.getElementById('contactsList');
+            const contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
+            list.innerHTML = '';
+
+            contacts.forEach((c, index) => {
+                list.innerHTML += `
+                    <div class="contact-card">
+                        <div class="contact-info">
+                            <strong>${c.name}</strong>
+                            <small>${c.phone}</small>
+                        </div>
+                        <div class="contact-actions">
+                            <a href="tel:${c.phone}" class="call-btn">Anrufen</a>
+                            <button class="del-btn" onclick="deleteContact(${index})"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
     </script>
 </body>
 </html>
-
