@@ -4,243 +4,352 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>FamilyHub Pro</title>
+    <title>FamilyHub v2</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
         :root {
-            --bg-color: #f0f2f5;
+            --bg-color: #f2f2f7;
             --primary-blue: #007aff;
             --success-green: #34c759;
             --danger-red: #ff3b30;
-            --fav-yellow: #ffcc00;
-            --tab-bar-bg: rgba(255, 255, 255, 0.85);
+            --info-blue: #5ac8fa; /* Für die Tage-Anzeige */
+            --tab-bar-bg: rgba(255, 255, 255, 0.9);
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-color);
             margin: 0;
-            padding-bottom: 100px;
+            padding-bottom: 110px; /* Mehr Platz für TabBar */
             -webkit-user-select: none;
+            color: #1c1c1e;
         }
 
+        /* --- LAYOUT & ANIMATION --- */
         section { display: none; padding: 20px; animation: fadeIn 0.3s ease; flex-direction: column; align-items: center; }
         section.active { display: flex; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        h1 { margin-top: 40px; font-size: 28px; color: #1c1c1e; text-align: center; }
-        h3 { width: 100%; margin-top: 25px; color: #3a3a3c; border-bottom: 1px solid #d1d1d6; padding-bottom: 5px; font-size: 18px; }
+        h1 { margin-top: 40px; font-size: 28px; text-align: center; margin-bottom: 20px; }
+        h3 { width: 100%; margin-top: 20px; border-bottom: 1px solid #d1d1d6; padding-bottom: 5px; font-size: 18px; color: #636366; }
 
-        .abc-header { width: 100%; padding: 5px 15px; font-weight: bold; color: #8e8e93; font-size: 14px; margin-top: 10px; text-transform: uppercase; align-self: flex-start; }
+        /* --- CARDS & LISTS --- */
+        .card-container { width: 100%; background: white; border-radius: 12px; padding: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); box-sizing: border-box; margin-bottom: 15px; }
+        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f2f2f7; }
+        .list-item:last-child { border-bottom: none; }
+        
+        /* --- INPUT FORMS --- */
+        input, select, textarea {
+            width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #d1d1d6; border-radius: 10px;
+            font-size: 16px; box-sizing: border-box; background: #fff; font-family: inherit;
+        }
+        button.action-btn {
+            width: 100%; padding: 14px; background: var(--primary-blue); color: white; border: none;
+            border-radius: 12px; font-size: 17px; font-weight: 600; margin-top: 10px; cursor: pointer;
+        }
+        button.delete-btn { background: var(--danger-red); width: auto; padding: 5px 10px; font-size: 12px; margin-left: 10px; }
+        button.done-btn { background: var(--success-green); width: auto; padding: 5px 10px; font-size: 12px; }
 
-        /* --- ROUTINE & SOUNDS --- */
-        .progress-container { width: 100%; height: 18px; background: #e5e5ea; border-radius: 10px; margin: 20px 0; overflow: hidden; }
-        #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary-blue), #5856d6); transition: width 0.4s; }
+        /* --- ROUTINE GRID --- */
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
-        .card { background: white; border-radius: 20px; height: 120px; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 3px solid transparent; transition: 0.2s; -webkit-tap-highlight-color: transparent; position: relative; }
-        .card.done { background: var(--success-green); color: white; transform: scale(0.95); }
-        .card .icon { font-size: 40px; margin-bottom: 8px; }
+        .routine-card { background: white; border-radius: 20px; height: 110px; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: 0.2s; }
+        .routine-card.done { background: var(--success-green); color: white; transform: scale(0.95); opacity: 0.8; }
+        .routine-card .icon { font-size: 35px; margin-bottom: 5px; }
+        .progress-bar-bg { width: 100%; height: 10px; background: #e5e5ea; border-radius: 5px; overflow: hidden; margin-bottom: 20px; }
+        .progress-fill { height: 100%; background: var(--primary-blue); width: 0%; transition: width 0.3s; }
 
-        /* Video Overlay */
-        #videoOverlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:5000; justify-content:center; align-items:center; flex-direction:column; color: white; }
-
-        /* --- KONTAKTE & DETAILS --- */
-        .list-card { background: white; width: 100%; padding: 15px; border-radius: 18px; margin-bottom: 8px; box-sizing: border-box; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
-        .contact-main { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-        .contact-details { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid #f2f2f7; font-size: 15px; color: #333; line-height: 1.8; }
-        .contact-details.show { display: block; }
-        .contact-details p { margin: 5px 0; display: flex; align-items: center; gap: 10px; }
-        .maps-link { color: var(--primary-blue); text-decoration: none; font-weight: 500; }
-        .contact-actions { display: flex; gap: 12px; align-items: center; }
-        .call-btn { background: var(--success-green); color: white; width: 38px; height: 38px; border-radius: 19px; display: flex; align-items: center; justify-content: center; text-decoration: none; }
-        .fav-btn { color: #ccc; background: none; border: none; font-size: 20px; }
-        .fav-btn.active { color: var(--fav-yellow); }
-
-        /* --- MÜLL --- */
-        .trash-item { border-left: 6px solid #ccc; }
-        .trash-Rest { border-color: #333; }
-        .trash-Bio { border-color: #8B4513; }
-        .trash-Papier { border-color: #007aff; }
-        .trash-Gelb { border-color: #ffcc00; }
+        /* --- TASK BADGES --- */
+        .badge-blue { color: var(--primary-blue); font-weight: bold; font-size: 0.9em; background: rgba(0,122,255,0.1); padding: 2px 6px; border-radius: 6px; }
+        .task-meta { font-size: 12px; color: #8e8e93; margin-top: 4px; }
 
         /* --- NAV --- */
-        .tab-bar { position: fixed; bottom: 0; width: 100%; height: 85px; background: var(--tab-bar-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); display: flex; justify-content: space-around; align-items: center; border-top: 0.5px solid #d1d1d6; padding-bottom: env(safe-area-inset-bottom); z-index: 1000; }
-        .tab-item { display: flex; flex-direction: column; align-items: center; color: #8e8e93; font-size: 11px; text-decoration: none; width: 33%; }
+        .tab-bar { position: fixed; bottom: 0; width: 100%; height: 85px; background: var(--tab-bar-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); display: flex; justify-content: space-around; align-items: center; border-top: 0.5px solid #c6c6c8; padding-bottom: env(safe-area-inset-bottom); z-index: 1000; }
+        .tab-item { display: flex; flex-direction: column; align-items: center; color: #999; font-size: 10px; text-decoration: none; width: 20%; }
         .tab-item.active { color: var(--primary-blue); }
-        .tab-item i { font-size: 24px; margin-bottom: 4px; }
-        
-        #confetti { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 100px; display: none; z-index: 6000; pointer-events: none; }
+        .tab-item i { font-size: 22px; margin-bottom: 4px; }
     </style>
 </head>
 <body>
 
-    <audio id="snd-0" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio> <audio id="snd-1" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio> <audio id="snd-2" src="https://assets.mixkit.co/active_storage/sfx/2500/2500-preview.mp3"></audio> <audio id="snd-3" src="https://assets.mixkit.co/active_storage/sfx/1000/1000-preview.mp3"></audio> <audio id="snd-4" src="https://assets.mixkit.co/active_storage/sfx/2800/2800-preview.mp3"></audio> <audio id="snd-5" src="https://assets.mixkit.co/active_storage/sfx/2100/2100-preview.mp3"></audio> <audio id="finalSuccess" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
-
     <section id="routine" class="active">
-        <h1>Routine 🌙</h1>
-        <div class="progress-container"><div id="progress-bar"></div></div>
+        <h1>Gute Nacht! 🌙</h1>
+        <div class="progress-bar-bg"><div id="progress-fill" class="progress-fill"></div></div>
         <div class="grid">
-            <div class="card" onclick="toggleTask(this, 0)"><span class="icon">🍎</span><span class="label">Abendessen</span></div>
-            <div class="card" onclick="toggleTask(this, 1)"><span class="icon">🧸</span><span class="label">Aufräumen</span></div>
-            <div class="card" onclick="toggleTask(this, 2)"><span class="icon">🪥</span><span class="label">Zähneputzen</span></div>
-            <div class="card" onclick="toggleTask(this, 3)"><span class="icon">👚</span><span class="label">Schlafanzug</span></div>
-            <div class="card" onclick="toggleTask(this, 4)"><span class="icon">🧺</span><span class="label">Wäschesack</span></div>    
-            <div class="card" onclick="toggleTask(this, 5)"><span class="icon">🪮</span><span class="label">Haarekämmen</span></div>
+            <div class="routine-card" onclick="toggleRoutine(this)"><span class="icon">🍎</span><span>Essen</span></div>
+            <div class="routine-card" onclick="toggleRoutine(this)"><span class="icon">🧸</span><span>Aufräumen</span></div>
+            <div class="routine-card" onclick="toggleRoutine(this)"><span class="icon">🪥</span><span>Zähne</span></div>
+            <div class="routine-card" onclick="toggleRoutine(this)"><span class="icon">👚</span><span>Schlafanzug</span></div>
+            <div class="routine-card" onclick="toggleRoutine(this)"><span class="icon">📖</span><span>Vorlesen</span></div>    
+            <div class="routine-card" onclick="toggleRoutine(this)"><span class="icon">😴</span><span>Schlafen</span></div>
         </div>
-        <button style="margin-top: 30px; background: none; border: none; color: #8e8e93;" onclick="resetRoutine(true)">Liste zurücksetzen</button>
     </section>
 
-    <div id="videoOverlay" onclick="this.style.display='none'">
-        <video id="rewardVideo" width="90%" playsinline>
-            <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
-        </video>
-        <h2 style="margin-top:20px;">Super gemacht! 🎉</h2>
-    </div>
-
     <section id="calendar">
-        <h1>Kalender 📅</h1>
+        <h1>Übersicht 📅</h1>
+        
         <div id="trashDisplay" style="width: 100%;"></div>
-        <div style="margin-top: 15px; background: white; padding: 15px; border-radius: 18px; width: 100%; box-sizing: border-box;">
-            <h4 style="margin: 0 0 5px 0; font-size: 14px; color: #3a3a3c;">Upload-Filter:</h4>
-            <input type="text" id="filterInput" placeholder="z.B. 4-wöchentlich" onchange="saveFilter()" style="margin:0; font-size: 14px; padding: 10px;">
+        
+        <h3>Nächste Geburtstage 🎂</h3>
+        <div class="card-container" id="birthdayList">
+            </div>
+
+        <h3>Meine Aufgaben heute</h3>
+        <div class="card-container" id="calendarTasksPreview">
+            <small style="color:#888;">Siehe "Aufgaben" Tab für Details</small>
         </div>
-        <div id="birthdayDisplay" style="width: 100%;"></div>
-        <div style="margin-top: 20px; text-align: center; display: flex; flex-direction: column; gap: 15px;">
-            <input type="file" id="icsInput" style="display:none" accept=".ics" onchange="importIcs(event)">
-            <label for="icsInput" style="color: var(--primary-blue); font-size: 15px; cursor: pointer; font-weight: 500;">
-                <i class="fas fa-file-import"></i> Müllkalender einlesen
-            </label>
+    </section>
+
+    <section id="tasks">
+        <h1>Aufgaben ✅</h1>
+        
+        <div class="card-container">
+            <h4 style="margin:0 0 10px 0;">Neue Aufgabe</h4>
+            <div style="display:flex; gap:10px;">
+                <input type="text" id="taskCreator" placeholder="Ersteller (z.B. Mama)">
+                <select id="taskAssignee">
+                    <option value="" disabled selected>Für wen?</option>
+                    <option>Mama</option>
+                    <option>Papa</option>
+                    <option>Kind 1</option>
+                    <option>Alle</option>
+                </select>
+            </div>
+            <input type="date" id="taskDate">
+            <textarea id="taskText" rows="2" placeholder="Was ist zu tun?"></textarea>
+            <button class="action-btn" onclick="createTask()">Erstellen</button>
         </div>
+
+        <h3>Offene Aufgaben</h3>
+        <div id="taskListContainer" style="width: 100%;"></div>
     </section>
 
     <section id="contacts">
         <h1>Kontakte 📞</h1>
+        <div class="card-container">
+            <button class="action-btn" onclick="openContactModal()" style="background:#e5e5ea; color:#333; margin-top:0;">+ Neuer Kontakt</button>
+        </div>
         <div id="contactsList" style="width: 100%;"></div>
-        <button class="fab" onclick="openContactModal()"><i class="fas fa-plus"></i></button>
+    </section>
+
+    <section id="settings">
+        <h1>Einstellungen ⚙️</h1>
+        
+        <div class="card-container">
+            <h3>📂 Müllkalender Import</h3>
+            <p style="font-size:13px; color:#666;">Lade hier deine .ics Datei vom Entsorger hoch.</p>
+            <label style="display:block; margin-top:10px;">Filter (Kommagetrennt):</label>
+            <input type="text" id="filterInput" placeholder="z.B. 4-wöchentlich" onchange="saveFilter()">
+            
+            <input type="file" id="icsInput" style="display:none" accept=".ics" onchange="importIcs(event)">
+            <label for="icsInput" class="action-btn" style="display:block; text-align:center; margin-top:10px;">
+                <i class="fas fa-cloud-upload-alt"></i> ICS Datei wählen
+            </label>
+            <div id="importStatus" style="margin-top:10px; font-size:12px; color:green;"></div>
+        </div>
+
+        <div class="card-container">
+            <h3>🔐 Sicherheit</h3>
+            <button class="action-btn" style="background:var(--danger-red);" onclick="clearAllData()">Alle Daten löschen</button>
+        </div>
     </section>
 
     <nav class="tab-bar">
-        <a href="#" class="tab-item active" onclick="showTab('routine', this)">
-            <i class="fas fa-tasks"></i><span>Routine</span>
+        <a href="#" class="tab-item active" onclick="nav('routine', this)">
+            <i class="fas fa-child"></i><span>Routine</span>
         </a>
-        <a href="#" class="tab-item" onclick="showTab('calendar', this)">
+        <a href="#" class="tab-item" onclick="nav('calendar', this)">
             <i class="fas fa-calendar-alt"></i><span>Kalender</span>
         </a>
-        <a href="#" class="tab-item" onclick="showTab('contacts', this)">
+        <a href="#" class="tab-item" onclick="nav('tasks', this)">
+            <i class="fas fa-check-circle"></i><span>Aufgaben</span>
+        </a>
+        <a href="#" class="tab-item" onclick="nav('contacts', this)">
             <i class="fas fa-address-book"></i><span>Kontakte</span>
         </a>
+        <a href="#" class="tab-item" onclick="nav('settings', this)">
+            <i class="fas fa-cog"></i><span>Optionen</span>
+        </a>
     </nav>
-
-    <div id="confetti">🎉</div>
 
     <script>
         const DELETE_PIN = "2410";
 
         // --- NAVIGATION ---
-        function showTab(id, el) {
+        function nav(id, el) {
             document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
             el.classList.add('active');
+            
+            // Refresh Data on Nav
             if(id === 'calendar') { renderTrash(); renderBirthdays(); }
             if(id === 'contacts') { renderContacts(); }
+            if(id === 'tasks') { renderTasks(); }
         }
 
-        // --- ROUTINE LOGIK MIT SOUNDS ---
-        function toggleTask(el, i) {
-            const isDone = el.classList.toggle('done');
-            if(isDone) {
-                const snd = document.getElementById('snd-' + i);
-                if(snd) { snd.currentTime = 0; snd.play(); }
-            }
-            updateProgress();
+        // --- ROUTINE ---
+        function toggleRoutine(el) {
+            el.classList.toggle('done');
+            const total = document.querySelectorAll('.routine-card').length;
+            const done = document.querySelectorAll('.routine-card.done').length;
+            document.getElementById('progress-fill').style.width = (done/total*100) + "%";
+            if(done === total) alert("🎉 Super gemacht! Alles erledigt!");
         }
 
-        function updateProgress() {
-            const cards = document.querySelectorAll('#routine .card');
-            const done = document.querySelectorAll('#routine .card.done').length;
-            document.getElementById('progress-bar').style.width = (done/cards.length*100) + '%';
-            
-            if(done === cards.length && done > 0) {
-                const overlay = document.getElementById('videoOverlay');
-                const video = document.getElementById('rewardVideo');
-                const confetti = document.getElementById('confetti');
+        // --- TASKS (AUFGABEN) LOGIK ---
+        function createTask() {
+            const creator = document.getElementById('taskCreator').value;
+            const assignee = document.getElementById('taskAssignee').value;
+            const date = document.getElementById('taskDate').value;
+            const text = document.getElementById('taskText').value;
+
+            if(!creator || !assignee || !text) { alert("Bitte fülle alle Felder aus."); return; }
+
+            const newTask = {
+                id: Date.now(),
+                creator, assignee, date, text,
+                done: false
+            };
+
+            let tasks = JSON.parse(localStorage.getItem('familyTasks')) || [];
+            tasks.push(newTask);
+            localStorage.setItem('familyTasks', JSON.stringify(tasks));
+
+            // Reset Form
+            document.getElementById('taskText').value = "";
+            renderTasks();
+            alert("Aufgabe erstellt!");
+        }
+
+        function renderTasks() {
+            const container = document.getElementById('taskListContainer');
+            const tasks = JSON.parse(localStorage.getItem('familyTasks')) || [];
+            container.innerHTML = '';
+
+            // Sortierung: Datum (nächste zuerst)
+            tasks.sort((a,b) => new Date(a.date) - new Date(b.date));
+
+            tasks.forEach(task => {
+                if(task.done) return; // Erledigte ausblenden
+
+                const dateDisplay = task.date ? new Date(task.date).toLocaleDateString('de-DE') : "Kein Datum";
                 
-                overlay.style.display = 'flex';
-                confetti.style.display = 'block';
-                video.play();
-                document.getElementById('finalSuccess').play();
-                
-                setTimeout(() => { 
-                    overlay.style.display = 'none'; 
-                    confetti.style.display = 'none';
-                    video.pause();
-                }, 8000);
-            }
-        }
-
-        function resetRoutine(ask) {
-            if(ask && !confirm("Routine zurücksetzen?")) return;
-            document.querySelectorAll('#routine .card').forEach(c => c.classList.remove('done'));
-            updateProgress();
-        }
-
-        // --- KONTAKTE (Google Maps & Bday Fix) ---
-        function renderContacts() {
-            const list = document.getElementById('contactsList');
-            let contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
-            list.innerHTML = '';
-            contacts.sort((a,b) => a.name.localeCompare(b.name)).forEach(c => {
-                const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.addr)}`;
-                const bdayStr = c.bday ? new Date(c.bday).toLocaleDateString('de-DE') : 'Kein Datum';
-                
-                list.innerHTML += `
-                <div class="list-card">
-                    <div class="contact-main">
-                        <div onclick="this.parentElement.nextElementSibling.classList.toggle('show')" style="flex-grow:1">
-                            <strong>${c.name}</strong><br><small>${c.rel || 'Kontakt'}</small>
-                        </div>
-                        <div class="contact-actions">
-                            <a href="tel:${c.phone}" class="call-btn"><i class="fas fa-phone"></i></a>
-                        </div>
+                const html = `
+                <div class="card-container" style="border-left: 5px solid var(--primary-blue);">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                        <strong>${task.text}</strong>
+                        <span class="badge-blue">${task.assignee}</span>
                     </div>
-                    <div class="contact-details">
-                        <p><i class="fas fa-birthday-cake"></i> ${bdayStr}</p>
-                        ${c.addr ? `<p><i class="fas fa-map-marker-alt"></i> <a href="${mapsUrl}" target="_blank" class="maps-link">${c.addr}</a></p>` : ''}
-                        <button onclick="deleteContactWithPin(${c.id})" style="color:red; background:none; border:none; font-size:12px; margin-top:10px;">Löschen</button>
+                    <div class="task-meta">
+                        <i class="far fa-clock"></i> Bis: ${dateDisplay} | Von: ${task.creator}
+                    </div>
+                    <div style="margin-top:10px; display:flex; justify-content:flex-end;">
+                        <button class="done-btn" onclick="completeTask(${task.id})"><i class="fas fa-check"></i> Fertig</button>
+                        <button class="delete-btn" onclick="deleteTask(${task.id})"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>`;
+                container.innerHTML += html;
             });
+
+            if(tasks.filter(t => !t.done).length === 0) container.innerHTML = '<p style="text-align:center; color:#999;">Alles erledigt! 🏖️</p>';
         }
 
-        // --- HILFSFUNKTIONEN (Müll, Filter, etc.) ---
-        function saveFilter() { localStorage.setItem('trashFilter', document.getElementById('filterInput').value); }
-        window.onload = function() { 
-            document.getElementById('filterInput').value = localStorage.getItem('trashFilter') || "4-wöchentlich";
-            renderContacts(); 
-        };
+        function completeTask(id) {
+            let tasks = JSON.parse(localStorage.getItem('familyTasks')) || [];
+            const idx = tasks.findIndex(t => t.id === id);
+            if(idx > -1) {
+                tasks[idx].done = true;
+                localStorage.setItem('familyTasks', JSON.stringify(tasks));
+                renderTasks();
+            }
+        }
 
-        // --- (Restliche Müll-Logik wie gehabt) ---
+        function deleteTask(id) {
+            if(prompt("PIN zum Löschen eingeben:") === DELETE_PIN) {
+                let tasks = JSON.parse(localStorage.getItem('familyTasks')) || [];
+                tasks = tasks.filter(t => t.id !== id);
+                localStorage.setItem('familyTasks', JSON.stringify(tasks));
+                renderTasks();
+            } else {
+                alert("Falsche PIN");
+            }
+        }
+
+        // --- KALENDER & GEBURTSTAGE ---
+        function calcDaysUntil(dateStr) {
+            if(!dateStr) return null;
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            
+            const bday = new Date(dateStr);
+            bday.setFullYear(today.getFullYear());
+            bday.setHours(0,0,0,0);
+            
+            // Wenn Geburtstag dieses Jahr schon war, nächstes Jahr nehmen
+            if (bday < today) {
+                bday.setFullYear(today.getFullYear() + 1);
+            }
+            
+            const diffTime = Math.abs(bday - today);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+            return diffDays;
+        }
+
+        function renderBirthdays() {
+            const list = document.getElementById('birthdayList');
+            const contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
+            list.innerHTML = '';
+
+            let upcoming = contacts.filter(c => c.bday).map(c => {
+                return { ...c, days: calcDaysUntil(c.bday) };
+            }).sort((a,b) => a.days - b.days).slice(0, 3);
+
+            upcoming.forEach(c => {
+                const dayText = c.days === 0 ? "HEUTE!" : c.days === 1 ? "Morgen" : `in <span style="color:var(--primary-blue); font-weight:bold;">${c.days} Tagen</span>`;
+                
+                list.innerHTML += `
+                <div class="list-item">
+                    <div>
+                        <strong>${c.name}</strong>
+                        <div style="font-size:12px; color:#666;">${new Date(c.bday).toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit'})}.</div>
+                    </div>
+                    <div style="text-align:right;">${dayText}</div>
+                </div>`;
+            });
+            if(upcoming.length === 0) list.innerHTML = '<p style="text-align:center; color:#999;">Keine Geburtstage hinterlegt.</p>';
+        }
+
+        // --- IMPORT & MÜLL (Settings Tab) ---
+        function saveFilter() { localStorage.setItem('trashFilter', document.getElementById('filterInput').value); alert("Filter gespeichert"); }
+        
         function importIcs(e) {
             const file = e.target.files[0];
-            const filter = (document.getElementById('filterInput').value || "").toLowerCase().split(',').map(s=>s.trim());
+            if(!file) return;
             const reader = new FileReader();
+            const filter = (document.getElementById('filterInput').value || "").toLowerCase().split(',').map(s=>s.trim());
+            
             reader.onload = function(f) {
                 const lines = f.target.result.split(/\r?\n/);
-                let events = [], cur = null;
+                let events = [], cur = {};
                 lines.forEach(l => {
                     if(l.startsWith('BEGIN:VEVENT')) cur = {};
-                    else if(l.startsWith('SUMMARY:')) cur.s = l.replace('SUMMARY:','').trim();
-                    else if(l.startsWith('DTSTART')) cur.d = (l.match(/\d{8}/) || [])[0];
-                    else if(l.startsWith('END:VEVENT') && cur.s && cur.d) {
+                    if(l.startsWith('SUMMARY:')) cur.s = l.replace('SUMMARY:','').trim();
+                    if(l.startsWith('DTSTART')) cur.d = (l.match(/\d{8}/) || [])[0];
+                    if(l.startsWith('END:VEVENT') && cur.s && cur.d) {
                         const sL = cur.s.toLowerCase();
-                        if(sL.match(/müll|abfuhr|tonne|papier|gelb|bio/) && !filter.some(f => sL.includes(f))) events.push(cur);
+                        // Einfache Logik: Wenn Filter leer ist, alles nehmen, sonst filtern
+                        if(sL.match(/müll|abfuhr|tonne|papier|gelb|bio/)) {
+                             // Prüfen ob ein Ausschlusskriterium vorliegt
+                             if(!filter.some(fil => fil !== "" && sL.includes(fil))) {
+                                events.push(cur);
+                             }
+                        }
                     }
                 });
                 localStorage.setItem('trashData', JSON.stringify(events.sort((a,b)=>a.d.localeCompare(b.d))));
+                document.getElementById('importStatus').innerText = `${events.length} Termine importiert!`;
                 renderTrash();
             };
             reader.readAsText(file);
@@ -249,29 +358,62 @@
         function renderTrash() {
             const div = document.getElementById('trashDisplay');
             const data = JSON.parse(localStorage.getItem('trashData')) || [];
-            div.innerHTML = '<h3>Müllabfuhr 🗑️</h3>';
-            data.filter(x => x.d >= new Date().toISOString().split('T')[0].replace(/-/g,'')).slice(0, 5).forEach(x => {
-                let cls = x.s.includes('Bio')?'trash-Bio':x.s.includes('Papier')?'trash-Papier':x.s.includes('Gelb')?'trash-Gelb':'trash-Rest';
-                div.innerHTML += `<div class="list-card trash-item ${cls}"><strong>${x.s}</strong><br><small>${x.d.slice(6,8)}.${x.d.slice(4,6)}.${x.d.slice(0,4)}</small></div>`;
-            });
+            div.innerHTML = '';
+            
+            const todayStr = new Date().toISOString().split('T')[0].replace(/-/g,'');
+            const nextTrash = data.filter(x => x.d >= todayStr).slice(0, 3);
+
+            if(nextTrash.length > 0) {
+                div.innerHTML = '<h3>Müllabfuhr 🗑️</h3><div class="card-container">';
+                nextTrash.forEach(x => {
+                    let color = '#333';
+                    if(x.s.includes('Bio')) color = '#8B4513';
+                    if(x.s.includes('Papier') || x.s.includes('Blaue')) color = '#007aff';
+                    if(x.s.includes('Gelb') || x.s.includes('Verpackung')) color = '#ffcc00';
+                    
+                    const dateFmt = `${x.d.slice(6,8)}.${x.d.slice(4,6)}.`;
+                    
+                    div.lastChild.innerHTML += `
+                    <div class="list-item" style="border-left: 4px solid ${color}; padding-left:10px;">
+                        <span>${x.s}</span>
+                        <strong>${dateFmt}</strong>
+                    </div>`;
+                });
+                div.innerHTML += '</div>';
+            }
         }
 
-        function renderBirthdays() {
-            const div = document.getElementById('birthdayDisplay');
-            const contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
-            div.innerHTML = '<h3>Geburtstage 🎂</h3>';
-            contacts.filter(c => c.bday).slice(0,3).forEach(b => {
-                div.innerHTML += `<div class="list-card"><strong>${b.name}</strong> am ${new Date(b.bday).toLocaleDateString('de-DE')}</div>`;
+        // --- KONTAKTE (Placeholder Logic) ---
+        function renderContacts() {
+            const list = document.getElementById('contactsList');
+            let contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
+            list.innerHTML = '';
+            contacts.forEach(c => {
+                list.innerHTML += `<div class="card-container" style="margin-bottom:5px; padding:10px;">${c.name} (${c.rel})</div>`;
             });
         }
-
-        function deleteContactWithPin(id) {
-            if(prompt("PIN:") === DELETE_PIN) {
-                let c = JSON.parse(localStorage.getItem('familyContacts'));
-                localStorage.setItem('familyContacts', JSON.stringify(c.filter(x => x.id !== id)));
+        function openContactModal() {
+            const name = prompt("Name:");
+            const rel = prompt("Beziehung (Papa, Oma...):");
+            const bday = prompt("Geburtstag (YYYY-MM-DD):");
+            if(name) {
+                let c = JSON.parse(localStorage.getItem('familyContacts')) || [];
+                c.push({id: Date.now(), name, rel, bday, addr: "", phone: ""});
+                localStorage.setItem('familyContacts', JSON.stringify(c));
                 renderContacts();
             }
         }
+        function clearAllData() {
+            if(prompt("PIN zum Löschen ALLER DATEN:") === DELETE_PIN) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        // Init
+        document.getElementById('filterInput').value = localStorage.getItem('trashFilter') || "4-wöchentlich";
+        // Default Tab
+        // nav('calendar', document.querySelectorAll('.tab-item')[1]); 
     </script>
 </body>
 </html>
