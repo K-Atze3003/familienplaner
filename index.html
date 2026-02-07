@@ -33,11 +33,11 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         h1 { margin-top: 40px; font-size: 28px; color: #1c1c1e; text-align: center; }
-        h3 { width: 100%; margin-top: 20px; color: #3a3a3c; border-bottom: 1px solid #d1d1d6; padding-bottom: 5px; }
+        h3 { width: 100%; margin-top: 25px; color: #3a3a3c; border-bottom: 1px solid #d1d1d6; padding-bottom: 5px; font-size: 18px; }
 
         /* --- ROUTINE STYLE --- */
         .progress-container { width: 100%; height: 18px; background: #e5e5ea; border-radius: 10px; margin: 20px 0; overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
-        #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary-blue), #5856d6); transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary-blue), #5856d6); transition: width 0.4s; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
         .card { background: white; border-radius: 20px; height: 130px; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 3px solid transparent; transition: 0.2s; -webkit-tap-highlight-color: transparent; }
         .card.done { background: var(--success-green); color: white; transform: scale(0.95); }
@@ -47,18 +47,15 @@
         /* --- KONTAKTE & KALENDER CARDS --- */
         .list-card { background: white; width: 100%; padding: 15px; border-radius: 20px; margin-bottom: 12px; box-sizing: border-box; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         
-        /* Eingabeformulare */
         .input-group { background: white; width: 100%; padding: 15px; border-radius: 20px; margin-bottom: 20px; box-sizing: border-box; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         input { width: 100%; padding: 12px; margin: 6px 0; border: 1px solid #d1d1d6; border-radius: 10px; font-size: 16px; box-sizing: border-box; }
         .add-btn { width: 100%; background: var(--primary-blue); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: bold; font-size: 16px; margin-top: 10px; }
 
-        /* Kontakt Details */
         .contact-main { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-        .contact-details { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee; font-size: 14px; color: #666; animation: fadeIn 0.2s; }
+        .contact-details { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee; font-size: 14px; color: #666; }
         .contact-details.show { display: block; }
         .contact-actions { display: flex; gap: 10px; align-items: center; }
         
-        /* Buttons */
         .call-btn { background: var(--success-green); color: white; width: 40px; height: 40px; border-radius: 20px; display: flex; align-items: center; justify-content: center; text-decoration: none; }
         .fav-btn { color: #ccc; background: none; border: none; font-size: 22px; }
         .fav-btn.active { color: var(--fav-yellow); }
@@ -95,20 +92,21 @@
             <div class="card" onclick="toggleTask(this, 4)"><span class="icon">🧺</span><span class="label">Wäschesack</span></div>    
             <div class="card" onclick="toggleTask(this, 5)"><span class="icon">🪮</span><span class="label">Haarekämmen</span></div>
         </div>
-        <button style="margin-top: 30px; background: none; border: none; color: #8e8e93;" onclick="resetRoutine()">Liste zurücksetzen</button>
+        <button style="margin-top: 30px; background: none; border: none; color: #8e8e93;" onclick="resetRoutine(true)">Liste zurücksetzen</button>
     </section>
 
     <section id="calendar">
         <h1>Kalender 📅</h1>
         
-        <div class="upload-area">
+        <div id="trashDisplay" style="width: 100%;"></div>
+        
+        <div class="upload-area" style="margin-top: 10px;">
             <input type="file" id="icsInput" style="display:none" accept=".ics" onchange="importIcs(event)">
-            <label for="icsInput" style="color: var(--primary-blue); font-weight: bold; cursor: pointer;">
-                <i class="fas fa-file-import"></i> Müllkalender (.ics) einspielen
+            <label for="icsInput" style="color: var(--primary-blue); font-size: 14px; cursor: pointer;">
+                <i class="fas fa-file-import"></i> Müllkalender (.ics) aktualisieren
             </label>
         </div>
 
-        <div id="trashDisplay" style="width: 100%;"></div>
         <div id="birthdayDisplay" style="width: 100%;"></div>
     </section>
 
@@ -151,12 +149,18 @@
 
         // --- INITIALISIERUNG ---
         window.onload = function() {
-            // Routine
+            // Automatischer Tages-Reset der Routine
+            const lastDate = localStorage.getItem('lastOpenDate');
+            const todayStr = new Date().toDateString();
+            if (lastDate !== todayStr) {
+                resetRoutine(false);
+                localStorage.setItem('lastOpenDate', todayStr);
+            }
+
             const routine = JSON.parse(localStorage.getItem('routineState')) || [false, false, false, false, false, false];
             const cards = document.querySelectorAll('#routine .card');
             cards.forEach((c, i) => { if(routine[i]) c.classList.add('done'); });
             updateProgress();
-            // Kontakte
             renderContacts();
         };
 
@@ -180,12 +184,11 @@
             }
         }
 
-        function resetRoutine() {
-            if(confirm("Routine für heute zurücksetzen?")) {
-                document.querySelectorAll('#routine .card').forEach(c => c.classList.remove('done'));
-                localStorage.setItem('routineState', JSON.stringify([false,false,false,false,false,false]));
-                updateProgress();
-            }
+        function resetRoutine(ask) {
+            if(ask && !confirm("Routine zurücksetzen?")) return;
+            document.querySelectorAll('#routine .card').forEach(c => c.classList.remove('done'));
+            localStorage.setItem('routineState', JSON.stringify([false,false,false,false,false,false]));
+            updateProgress();
         }
 
         // --- KONTAKTE LOGIK ---
@@ -282,7 +285,7 @@
             const next = data.filter(x => x.d >= today).slice(0, 4);
             
             div.innerHTML = '<h3>Müllabfuhr 🗑️</h3>';
-            if(!next.length) div.innerHTML += '<p style="color:#888; font-size:14px">Keine Termine. Bitte .ics Datei laden.</p>';
+            if(!next.length) div.innerHTML += '<p style="color:#888; font-size:13px">Noch keine Termine geladen.</p>';
             next.forEach(x => {
                 let cls = x.s.includes('Bio')?'trash-Bio':x.s.includes('Papier')?'trash-Papier':x.s.includes('Gelb')?'trash-Gelb':'trash-Rest';
                 div.innerHTML += `<div class="list-card trash-item ${cls}"><strong>${x.s}</strong><br><small>${x.d.slice(6,8)}.${x.d.slice(4,6)}.${x.d.slice(0,4)}</small></div>`;
@@ -291,12 +294,47 @@
 
         function renderBirthdays() {
             const div = document.getElementById('birthdayDisplay');
-            const c = JSON.parse(localStorage.getItem('familyContacts')) || [];
-            const bd = c.filter(x => x.bday).sort((a,b) => a.bday.slice(5) > b.bday.slice(5) ? 1 : -1);
-            div.innerHTML = '<h3>Geburtstage 🎂</h3>';
-            if(!bd.length) div.innerHTML += '<p style="color:#888; font-size:14px">Keine Geburtstage gespeichert.</p>';
-            bd.forEach(x => {
-                div.innerHTML += `<div class="list-card"><strong>${x.name}</strong><br><small>am ${new Date(x.bday).toLocaleDateString('de-DE')}</small></div>`;
+            const contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
+            const today = new Date();
+            today.setHours(0,0,0,0);
+
+            // Geburtstags-Berechnung
+            let birthdays = contacts.filter(c => c.bday).map(c => {
+                const bDate = new Date(c.bday);
+                let nextBday = new Date(today.getFullYear(), bDate.getMonth(), bDate.getDate());
+                
+                if (nextBday < today) {
+                    nextBday.setFullYear(today.getFullYear() + 1);
+                }
+                
+                return { 
+                    name: c.name, 
+                    date: nextBday, 
+                    orig: bDate,
+                    diff: Math.ceil((nextBday - today) / (1000 * 60 * 60 * 24))
+                };
+            });
+
+            birthdays.sort((a, b) => a.diff - b.diff);
+
+            div.innerHTML = '<h3>Anstehende Geburtstage 🎂</h3>';
+            if(!birthdays.length) {
+                div.innerHTML += '<p style="color:#888; font-size:13px">Keine Daten vorhanden.</p>';
+                return;
+            }
+
+            birthdays.slice(0, 5).forEach(b => {
+                const daysLabel = b.diff === 0 ? "HEUTE! 🥳" : b.diff === 1 ? "morgen" : `in ${b.diff} Tagen`;
+                div.innerHTML += `
+                    <div class="list-card">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <strong>${b.name}</strong><br>
+                                <small>${b.date.toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit'})}</small>
+                            </div>
+                            <span style="font-size:12px; font-weight:bold; color:var(--primary-blue)">${daysLabel}</span>
+                        </div>
+                    </div>`;
             });
         }
     </script>
