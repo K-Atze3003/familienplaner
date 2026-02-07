@@ -34,7 +34,6 @@
         h1 { margin-top: 40px; font-size: 28px; color: #1c1c1e; text-align: center; }
         h3 { width: 100%; margin-top: 25px; color: #3a3a3c; border-bottom: 1px solid #d1d1d6; padding-bottom: 5px; font-size: 18px; }
 
-        /* ABC Header Style */
         .abc-header { width: 100%; padding: 5px 15px; font-weight: bold; color: #8e8e93; font-size: 14px; margin-top: 10px; text-transform: uppercase; align-self: flex-start; }
 
         /* --- ROUTINE STYLE --- */
@@ -58,11 +57,14 @@
         .save-btn { width: 100%; background: var(--primary-blue); color: white; border: none; padding: 16px; border-radius: 15px; font-weight: bold; font-size: 16px; margin-top: 10px; }
 
         .contact-main { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-        .contact-details { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid #f2f2f7; font-size: 14px; color: #666; line-height: 1.4; }
+        .contact-details { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid #f2f2f7; font-size: 14px; color: #666; line-height: 1.6; }
         .contact-details.show { display: block; }
         .contact-actions { display: flex; gap: 12px; align-items: center; }
         
+        /* Buttons & Links */
         .call-btn { background: var(--success-green); color: white; width: 38px; height: 38px; border-radius: 19px; display: flex; align-items: center; justify-content: center; text-decoration: none; }
+        .maps-btn { color: var(--primary-blue); text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; gap: 5px; }
+        .edit-btn { color: #8e8e93; background: none; border: none; font-size: 16px; padding: 5px; }
         .fav-btn { color: #ccc; background: none; border: none; font-size: 20px; }
         .fav-btn.active { color: var(--fav-yellow); }
         .del-btn { color: var(--danger-red); background: none; border: none; font-size: 18px; }
@@ -118,15 +120,16 @@
     <div id="contactModal" onclick="closeContactModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                <h2 style="margin:0">Neuer Kontakt</h2>
+                <h2 id="modalTitle" style="margin:0">Neuer Kontakt</h2>
                 <button onclick="closeContactModal()" style="border:none; background:none; font-size:24px; color:#ccc">&times;</button>
             </div>
+            <input type="hidden" id="editId">
             <input type="text" id="cName" placeholder="Name">
             <input type="tel" id="cPhone" placeholder="Telefonnummer">
             <input type="text" id="cRel" placeholder="Beziehung (z.B. Familie)">
             <input type="date" id="cBday">
-            <input type="text" id="cAddr" placeholder="Adresse">
-            <button class="save-btn" onclick="addNewContact()">Speichern</button>
+            <input type="text" id="cAddr" placeholder="Adresse (Straße, Ort)">
+            <button class="save-btn" onclick="saveContact()">Speichern</button>
         </div>
     </div>
 
@@ -165,9 +168,64 @@
             renderContacts();
         };
 
-        function openContactModal() { document.getElementById('contactModal').style.display = 'flex'; }
+        // --- MODAL & SAVE LOGIK ---
+        function openContactModal(editId = null) {
+            const modal = document.getElementById('contactModal');
+            const title = document.getElementById('modalTitle');
+            const editInput = document.getElementById('editId');
+            
+            if(editId) {
+                title.innerText = "Kontakt bearbeiten";
+                editInput.value = editId;
+                const contacts = JSON.parse(localStorage.getItem('familyContacts'));
+                const c = contacts.find(x => x.id == editId);
+                document.getElementById('cName').value = c.name;
+                document.getElementById('cPhone').value = c.phone;
+                document.getElementById('cRel').value = c.rel;
+                document.getElementById('cBday').value = c.bday;
+                document.getElementById('cAddr').value = c.addr;
+            } else {
+                title.innerText = "Neuer Kontakt";
+                editInput.value = "";
+                ["cName","cPhone","cRel","cBday","cAddr"].forEach(id => document.getElementById(id).value = '');
+            }
+            modal.style.display = 'flex';
+        }
+
         function closeContactModal() { document.getElementById('contactModal').style.display = 'none'; }
 
+        function saveContact() {
+            const name = document.getElementById('cName').value;
+            const phone = document.getElementById('cPhone').value;
+            const editId = document.getElementById('editId').value;
+            if(!name || !phone) return;
+
+            let contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
+
+            if(editId) {
+                const i = contacts.findIndex(x => x.id == editId);
+                contacts[i] = { ...contacts[i], 
+                    name, phone, 
+                    rel: document.getElementById('cRel').value,
+                    bday: document.getElementById('cBday').value,
+                    addr: document.getElementById('cAddr').value 
+                };
+            } else {
+                contacts.push({
+                    id: Date.now(), name, phone, 
+                    rel: document.getElementById('cRel').value,
+                    bday: document.getElementById('cBday').value,
+                    addr: document.getElementById('cAddr').value,
+                    fav: false
+                });
+            }
+
+            localStorage.setItem('familyContacts', JSON.stringify(contacts));
+            closeContactModal();
+            renderContacts();
+        }
+
+        // --- ROUTINE LOGIK ---
         function toggleTask(el, i) {
             el.classList.toggle('done');
             const state = Array.from(document.querySelectorAll('#routine .card')).map(c => c.classList.contains('done'));
@@ -193,44 +251,21 @@
             updateProgress();
         }
 
-        // --- KONTAKTE LOGIK ---
-        function addNewContact() {
-            const name = document.getElementById('cName').value;
-            const phone = document.getElementById('cPhone').value;
-            if(!name || !phone) return;
-            const contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
-            contacts.push({
-                id: Date.now(), name, phone, 
-                rel: document.getElementById('cRel').value,
-                bday: document.getElementById('cBday').value,
-                addr: document.getElementById('cAddr').value,
-                fav: false
-            });
-            localStorage.setItem('familyContacts', JSON.stringify(contacts));
-            ["cName","cPhone","cRel","cBday","cAddr"].forEach(id => document.getElementById(id).value = '');
-            closeContactModal();
-            renderContacts();
-        }
-
+        // --- KONTAKTE ANZEIGE ---
         function renderContacts() {
             const list = document.getElementById('contactsList');
             let contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
             list.innerHTML = '';
-
-            // 1. Sortieren (Alphabetisch)
             contacts.sort((a,b) => a.name.localeCompare(b.name));
 
-            // 2. Favoriten filtern und anzeigen
             const favs = contacts.filter(c => c.fav);
             if(favs.length > 0) {
                 list.innerHTML += `<div class="abc-header">Favoriten</div>`;
                 favs.forEach(c => list.innerHTML += createContactHTML(c));
             }
 
-            // 3. ABC-Sektionen (Nicht-Favoriten)
             const nonFavs = contacts.filter(c => !c.fav);
             let currentLetter = '';
-
             nonFavs.forEach(c => {
                 let firstLetter = c.name.charAt(0).toUpperCase();
                 if(firstLetter !== currentLetter) {
@@ -242,10 +277,13 @@
         }
 
         function createContactHTML(c) {
+            // Google Maps Link generieren
+            const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(c.addr)}`;
+            
             return `
                 <div class="list-card">
                     <div class="contact-main">
-                        <div onclick="document.getElementById('det-${c.id}').classList.toggle('show')">
+                        <div onclick="document.getElementById('det-${c.id}').classList.toggle('show')" style="flex-grow:1">
                             <strong>${c.name}</strong><br>
                             <small>${c.rel || 'Kontakt'}</small>
                         </div>
@@ -256,9 +294,14 @@
                         </div>
                     </div>
                     <div id="det-${c.id}" class="contact-details">
-                        <div><strong>Nummer:</strong> ${c.phone}</div>
-                        ${c.bday ? `<div><strong>Geburtstag:</strong> ${new Date(c.bday).toLocaleDateString('de-DE')}</div>` : ''}
-                        ${c.addr ? `<div><strong>Adresse:</strong> ${c.addr}</div>` : ''}
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                            <div>
+                                <div><i class="fas fa-phone-alt" style="width:20px"></i> ${c.phone}</div>
+                                ${c.bday ? `<div><i class="fas fa-birthday-cake" style="width:20px"></i> ${new Date(c.bday).toLocaleDateString('de-DE')}</div>` : ''}
+                                ${c.addr ? `<div><i class="fas fa-map-marker-alt" style="width:20px"></i> <a href="${mapsUrl}" class="maps-btn" target="_blank">${c.addr} <i class="fas fa-directions"></i></a></div>` : ''}
+                            </div>
+                            <button class="edit-btn" onclick="openContactModal(${c.id})"><i class="fas fa-pen"></i> Bearbeiten</button>
+                        </div>
                     </div>
                 </div>`;
         }
