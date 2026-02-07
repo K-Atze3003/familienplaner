@@ -36,7 +36,7 @@
 
         .abc-header { width: 100%; padding: 5px 15px; font-weight: bold; color: #8e8e93; font-size: 14px; margin-top: 10px; text-transform: uppercase; align-self: flex-start; }
 
-        /* --- ROUTINE STYLE --- */
+        /* --- ROUTINE --- */
         .progress-container { width: 100%; height: 18px; background: #e5e5ea; border-radius: 10px; margin: 20px 0; overflow: hidden; }
         #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary-blue), #5856d6); transition: width 0.4s; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
@@ -44,22 +44,38 @@
         .card.done { background: var(--success-green); color: white; transform: scale(0.95); }
         .card .icon { font-size: 40px; margin-bottom: 8px; }
 
-        /* --- LISTEN & KARTEN --- */
+        /* --- KARTEN --- */
         .list-card { background: white; width: 100%; padding: 15px; border-radius: 18px; margin-bottom: 8px; box-sizing: border-box; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
         .fab { position: fixed; right: 20px; bottom: 100px; width: 56px; height: 56px; background: var(--primary-blue); color: white; border-radius: 28px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 12px rgba(0,122,255,0.3); z-index: 500; border: none; }
 
-        /* --- INPUTS & FILTER --- */
-        input { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #d1d1d6; border-radius: 12px; font-size: 16px; box-sizing: border-box; background: #f9f9f9; }
-        .filter-box { margin-top: 15px; background: white; padding: 15px; border-radius: 18px; width: 100%; box-sizing: border-box; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
+        /* --- MODAL --- */
+        #contactModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: flex-end; }
+        .modal-content { background: white; width: 100%; padding: 25px 20px; border-radius: 25px 25px 0 0; box-sizing: border-box; animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
-        /* --- MÜLL FARBEN --- */
+        input { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #d1d1d6; border-radius: 12px; font-size: 16px; box-sizing: border-box; background: #f9f9f9; }
+        .save-btn { width: 100%; background: var(--primary-blue); color: white; border: none; padding: 16px; border-radius: 15px; font-weight: bold; font-size: 16px; margin-top: 10px; }
+
+        /* --- KONTAKTE DETAILS --- */
+        .contact-main { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        .contact-details { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid #f2f2f7; font-size: 14px; color: #666; line-height: 1.6; }
+        .contact-details.show { display: block; }
+        .contact-actions { display: flex; gap: 12px; align-items: center; }
+        .call-btn { background: var(--success-green); color: white; width: 38px; height: 38px; border-radius: 19px; display: flex; align-items: center; justify-content: center; text-decoration: none; }
+        .fav-btn { color: #ccc; background: none; border: none; font-size: 20px; }
+        .fav-btn.active { color: var(--fav-yellow); }
+        .detail-footer-actions { display: flex; justify-content: flex-end; gap: 15px; margin-top: 10px; }
+        .edit-btn { color: var(--primary-blue); background: none; border: none; font-size: 14px; }
+        .del-btn-text { color: var(--danger-red); background: none; border: none; font-size: 14px; }
+
+        /* --- MÜLL --- */
         .trash-item { border-left: 6px solid #ccc; }
         .trash-Rest { border-color: #333; }
         .trash-Bio { border-color: #8B4513; }
         .trash-Papier { border-color: #007aff; }
         .trash-Gelb { border-color: #ffcc00; }
 
-        /* --- NAVIGATION --- */
+        /* --- NAV --- */
         .tab-bar { position: fixed; bottom: 0; width: 100%; height: 85px; background: var(--tab-bar-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); display: flex; justify-content: space-around; align-items: center; border-top: 0.5px solid #d1d1d6; padding-bottom: env(safe-area-inset-bottom); z-index: 1000; }
         .tab-item { display: flex; flex-direction: column; align-items: center; color: #8e8e93; font-size: 11px; text-decoration: none; width: 33%; }
         .tab-item.active { color: var(--primary-blue); }
@@ -89,10 +105,9 @@
         <h1>Kalender 📅</h1>
         <div id="trashDisplay" style="width: 100%;"></div>
 
-        <div class="filter-box">
+        <div style="margin-top: 15px; background: white; padding: 15px; border-radius: 18px; width: 100%; box-sizing: border-box;">
             <h4 style="margin: 0 0 5px 0; font-size: 14px; color: #3a3a3c;">Upload-Filter:</h4>
-            <input type="text" id="filterInput" placeholder="z.B. 4-wöchentlich, Test" onchange="saveFilter()" style="margin:0; font-size: 14px; padding: 10px;">
-            <p style="font-size: 11px; color: #8e8e93; margin-top: 5px;">Begriffe trennen mit Komma. Diese Wörter werden beim Import ignoriert.</p>
+            <input type="text" id="filterInput" placeholder="z.B. 4-wöchentlich" onchange="saveFilter()" style="margin:0; font-size: 14px; padding: 10px;">
         </div>
 
         <div id="birthdayDisplay" style="width: 100%;"></div>
@@ -100,10 +115,10 @@
         <div style="margin-top: 20px; text-align: center; display: flex; flex-direction: column; gap: 15px;">
             <input type="file" id="icsInput" style="display:none" accept=".ics" onchange="importIcs(event)">
             <label for="icsInput" style="color: var(--primary-blue); font-size: 15px; cursor: pointer; font-weight: 500;">
-                <i class="fas fa-file-import"></i> Müllkalender (iCal) einlesen
+                <i class="fas fa-file-import"></i> Müllkalender einlesen
             </label>
-            <button onclick="clearTrashData()" style="background:none; border:none; color:var(--danger-red); font-size:12px;">
-                <i class="fas fa-trash-alt"></i> Gesamte Liste löschen (mit PIN)
+            <button onclick="clearTrashData()" style="background:none; border:none; color:var(--danger-red); font-size:11px;">
+                <i class="fas fa-trash-alt"></i> Müll-Daten leeren (PIN)
             </button>
         </div>
     </section>
@@ -113,6 +128,19 @@
         <div id="contactsList" style="width: 100%;"></div>
         <button class="fab" onclick="openContactModal()"><i class="fas fa-plus"></i></button>
     </section>
+
+    <div id="contactModal" onclick="closeContactModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h2 id="modalTitle">Neuer Kontakt</h2>
+            <input type="hidden" id="editId">
+            <input type="text" id="cName" placeholder="Name">
+            <input type="tel" id="cPhone" placeholder="Telefonnummer">
+            <input type="text" id="cRel" placeholder="Beziehung">
+            <input type="date" id="cBday">
+            <input type="text" id="cAddr" placeholder="Adresse">
+            <button class="save-btn" onclick="saveContact()">Speichern</button>
+        </div>
+    </div>
 
     <nav class="tab-bar">
         <a href="#" class="tab-item active" onclick="showTab('routine', this)">
@@ -131,152 +159,180 @@
     <script>
         const DELETE_PIN = "2410";
 
-        // --- NAVIGATION & INIT ---
         function showTab(id, el) {
             document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
             el.classList.add('active');
             if(id === 'calendar') { renderTrash(); renderBirthdays(); }
+            if(id === 'contacts') { renderContacts(); }
         }
 
         window.onload = function() {
-            // Filter laden
             document.getElementById('filterInput').value = localStorage.getItem('trashFilter') || "4-wöchentlich";
-            
-            const todayStr = new Date().toDateString();
-            if (localStorage.getItem('lastOpenDate') !== todayStr) {
-                resetRoutine(false);
-                localStorage.setItem('lastOpenDate', todayStr);
-            }
-            const routine = JSON.parse(localStorage.getItem('routineState')) || [false, false, false, false, false, false];
-            document.querySelectorAll('#routine .card').forEach((c, i) => { if(routine[i]) c.classList.add('done'); });
             updateProgress();
             renderContacts();
         };
 
-        // --- FILTER SPEICHERN ---
-        function saveFilter() {
-            localStorage.setItem('trashFilter', document.getElementById('filterInput').value);
-        }
+        function saveFilter() { localStorage.setItem('trashFilter', document.getElementById('filterInput').value); }
 
-        // --- ROUTINE LOGIK ---
+        // --- ROUTINE ---
         function toggleTask(el, i) {
             el.classList.toggle('done');
-            const state = Array.from(document.querySelectorAll('#routine .card')).map(c => c.classList.contains('done'));
-            localStorage.setItem('routineState', JSON.stringify(state));
             updateProgress();
         }
-
         function updateProgress() {
             const cards = document.querySelectorAll('#routine .card');
             const done = document.querySelectorAll('#routine .card.done').length;
             document.getElementById('progress-bar').style.width = (done/cards.length*100) + '%';
-            if(done === cards.length && done > 0) {
-                document.getElementById('confetti').style.display = 'block';
-                setTimeout(() => { document.getElementById('confetti').style.display = 'none'; }, 3000);
-            }
         }
-
         function resetRoutine(ask) {
-            if(ask && !confirm("Routine zurücksetzen?")) return;
+            if(ask && !confirm("Zurücksetzen?")) return;
             document.querySelectorAll('#routine .card').forEach(c => c.classList.remove('done'));
-            localStorage.setItem('routineState', JSON.stringify([false,false,false,false,false,false]));
             updateProgress();
         }
 
-        // --- MÜLLABFUHR LOGIK ---
+        // --- KONTAKTE ---
+        function openContactModal(editId = null) {
+            const modal = document.getElementById('contactModal');
+            if(editId) {
+                const c = (JSON.parse(localStorage.getItem('familyContacts'))).find(x => x.id == editId);
+                document.getElementById('editId').value = editId;
+                document.getElementById('cName').value = c.name;
+                document.getElementById('cPhone').value = c.phone;
+                document.getElementById('cRel').value = c.rel || '';
+                document.getElementById('cBday').value = c.bday || '';
+                document.getElementById('cAddr').value = c.addr || '';
+            } else {
+                document.getElementById('editId').value = '';
+                ["cName","cPhone","cRel","cBday","cAddr"].forEach(id => document.getElementById(id).value = '');
+            }
+            modal.style.display = 'flex';
+        }
+        function closeContactModal() { document.getElementById('contactModal').style.display = 'none'; }
+
+        function saveContact() {
+            let contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
+            const id = document.getElementById('editId').value;
+            const newC = {
+                id: id ? parseInt(id) : Date.now(),
+                name: document.getElementById('cName').value,
+                phone: document.getElementById('cPhone').value,
+                rel: document.getElementById('cRel').value,
+                bday: document.getElementById('cBday').value,
+                addr: document.getElementById('cAddr').value,
+                fav: id ? contacts.find(x => x.id == id).fav : false
+            };
+            if(id) contacts = contacts.map(x => x.id == id ? newC : x);
+            else contacts.push(newC);
+            localStorage.setItem('familyContacts', JSON.stringify(contacts));
+            closeContactModal();
+            renderContacts();
+        }
+
+        function renderContacts() {
+            const list = document.getElementById('contactsList');
+            let contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
+            list.innerHTML = '';
+            contacts.sort((a,b) => a.name.localeCompare(b.name));
+            
+            const favs = contacts.filter(c => c.fav);
+            if(favs.length) {
+                list.innerHTML += '<div class="abc-header">Favoriten</div>';
+                favs.forEach(c => list.innerHTML += createContactHTML(c));
+            }
+
+            let currentLetter = '';
+            contacts.filter(c => !c.fav).forEach(c => {
+                let L = c.name[0].toUpperCase();
+                if(L !== currentLetter) { currentLetter = L; list.innerHTML += `<div class="abc-header">${L}</div>`; }
+                list.innerHTML += createContactHTML(c);
+            });
+        }
+
+        function createContactHTML(c) {
+            return `
+            <div class="list-card">
+                <div class="contact-main">
+                    <div onclick="this.parentElement.nextElementSibling.classList.toggle('show')" style="flex-grow:1">
+                        <strong>${c.name}</strong><br><small>${c.rel || 'Kontakt'}</small>
+                    </div>
+                    <div class="contact-actions">
+                        <a href="tel:${c.phone}" class="call-btn"><i class="fas fa-phone"></i></a>
+                        <button class="fav-btn ${c.fav?'active':''}" onclick="toggleFav(${c.id})"><i class="fas fa-star"></i></button>
+                    </div>
+                </div>
+                <div class="contact-details">
+                    <p><i class="fas fa-phone-alt"></i> ${c.phone}</p>
+                    ${c.addr?`<p><i class="fas fa-map-marker-alt"></i> ${c.addr}</p>`:''}
+                    <div class="detail-footer-actions">
+                        <button class="edit-btn" onclick="openContactModal(${c.id})">Bearbeiten</button>
+                        <button class="del-btn-text" onclick="deleteContactWithPin(${c.id})">Löschen</button>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function toggleFav(id) {
+            let c = JSON.parse(localStorage.getItem('familyContacts'));
+            c = c.map(x => x.id === id ? {...x, fav: !x.fav} : x);
+            localStorage.setItem('familyContacts', JSON.stringify(c));
+            renderContacts();
+        }
+
+        function deleteContactWithPin(id) {
+            if(prompt("Lösch-PIN:") === DELETE_PIN) {
+                let c = JSON.parse(localStorage.getItem('familyContacts'));
+                localStorage.setItem('familyContacts', JSON.stringify(c.filter(x => x.id !== id)));
+                renderContacts();
+            }
+        }
+
+        // --- MÜLL ---
         function importIcs(e) {
             const file = e.target.files[0];
-            if (!file) return;
-
-            const filterText = document.getElementById('filterInput').value || "";
-            const excludeKeywords = filterText.split(',').map(s => s.trim().toLowerCase()).filter(s => s !== "");
-
+            const filter = (document.getElementById('filterInput').value || "").toLowerCase().split(',').map(s=>s.trim());
             const reader = new FileReader();
             reader.onload = function(f) {
                 const lines = f.target.result.split(/\r?\n/);
                 let events = [], cur = null;
-                
                 lines.forEach(l => {
                     if(l.startsWith('BEGIN:VEVENT')) cur = {};
                     else if(l.startsWith('SUMMARY:')) cur.s = l.replace('SUMMARY:','').trim();
-                    else if(l.startsWith('DTSTART')) {
-                        const match = l.match(/\d{8}/);
-                        if(match) cur.d = match[0];
-                    }
-                    else if(l.startsWith('END:VEVENT')) {
-                        if(cur && cur.s && cur.d) {
-                            const summaryLower = cur.s.toLowerCase();
-                            const isTrash = summaryLower.match(/müll|abfuhr|tonne|biomüll|gelber|papier|grünabfall/);
-                            const isExcluded = excludeKeywords.some(word => summaryLower.includes(word));
-
-                            if(isTrash && !isExcluded) { events.push(cur); }
-                        }
-                        cur = null;
+                    else if(l.startsWith('DTSTART')) cur.d = (l.match(/\d{8}/) || [])[0];
+                    else if(l.startsWith('END:VEVENT') && cur.s && cur.d) {
+                        const sL = cur.s.toLowerCase();
+                        if(sL.match(/müll|abfuhr|tonne|papier|gelb|bio/) && !filter.some(f => sL.includes(f))) events.push(cur);
                     }
                 });
-
                 localStorage.setItem('trashData', JSON.stringify(events.sort((a,b)=>a.d.localeCompare(b.d))));
-                alert(events.length + " Termine importiert.");
                 renderTrash();
-                e.target.value = ''; 
             };
             reader.readAsText(file);
-        }
-
-        function deleteSingleTrashWithPin(date, summary) {
-            const pin = prompt("Bitte Lösch-PIN eingeben:");
-            if (pin === DELETE_PIN) {
-                let data = JSON.parse(localStorage.getItem('trashData')) || [];
-                data = data.filter(x => !(x.d === date && x.s === summary));
-                localStorage.setItem('trashData', JSON.stringify(data));
-                renderTrash();
-            } else if (pin !== null) { alert("Falsche PIN!"); }
-        }
-
-        function clearTrashData() {
-            const pin = prompt("Lösch-PIN eingeben, um alle Müll-Daten zu leeren:");
-            if (pin === DELETE_PIN) {
-                localStorage.removeItem('trashData');
-                renderTrash();
-            } else if (pin !== null) { alert("Falsche PIN!"); }
         }
 
         function renderTrash() {
             const div = document.getElementById('trashDisplay');
             const data = JSON.parse(localStorage.getItem('trashData')) || [];
-            const todayStr = new Date().toISOString().split('T')[0].replace(/-/g,'');
-            const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
-            const tomorrowStr = tomorrow.toISOString().split('T')[0].replace(/-/g,'');
-            
+            const today = new Date().toISOString().split('T')[0].replace(/-/g,'');
             div.innerHTML = '<h3>Müllabfuhr 🗑️</h3>';
-            
-            const forTomorrow = data.find(x => x.d === tomorrowStr);
-            if(forTomorrow) {
-                div.innerHTML += `
-                    <div style="background: var(--danger-red); color: white; padding: 15px; border-radius: 15px; margin-bottom: 15px; animation: pulse 2s infinite;">
-                        <i class="fas fa-exclamation-triangle"></i> <strong>HEUTE RAUSSTELLEN:</strong><br>
-                        Morgen wird <strong>${forTomorrow.s}</strong> abgeholt!
-                    </div>`;
-            }
-
-            const next = data.filter(x => x.d >= todayStr).slice(0, 5);
-            if(!next.length) { div.innerHTML += '<p style="color:#888; font-size:13px">Keine Termine vorhanden.</p>'; return; }
-
-            next.forEach(x => {
+            data.filter(x => x.d >= today).slice(0, 5).forEach(x => {
                 let cls = x.s.includes('Bio')?'trash-Bio':x.s.includes('Papier')?'trash-Papier':x.s.includes('Gelb')?'trash-Gelb':'trash-Rest';
-                div.innerHTML += `
-                    <div class="list-card trash-item ${cls}">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <div><strong>${x.s}</strong><br><small>${x.d.slice(6,8)}.${x.d.slice(4,6)}.${x.d.slice(0,4)}</small></div>
-                            <button onclick="deleteSingleTrashWithPin('${x.d}', '${x.s}')" style="background:none; border:none; color:#ddd; font-size:18px;"><i class="fas fa-times-circle"></i></button>
-                        </div>
-                    </div>`;
+                div.innerHTML += `<div class="list-card trash-item ${cls}"><div style="display:flex; justify-content:space-between"><div><strong>${x.s}</strong><br><small>${x.d.slice(6,8)}.${x.d.slice(4,6)}.${x.d.slice(0,4)}</small></div><button onclick="deleteSingleTrashWithPin('${x.d}','${x.s}')" style="background:none;border:none;color:#ddd">×</button></div></div>`;
             });
         }
 
-        // --- GEBURTSTAGE & KONTAKTE (KOMPAKT) ---
+        function deleteSingleTrashWithPin(d, s) {
+            if(prompt("PIN:") === DELETE_PIN) {
+                let data = JSON.parse(localStorage.getItem('trashData')).filter(x => !(x.d===d && x.s===s));
+                localStorage.setItem('trashData', JSON.stringify(data));
+                renderTrash();
+            }
+        }
+
+        function clearTrashData() { if(prompt("PIN:") === DELETE_PIN) { localStorage.removeItem('trashData'); renderTrash(); } }
+
+        // --- GEBURTSTAGE ---
         function renderBirthdays() {
             const div = document.getElementById('birthdayDisplay');
             const contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
@@ -289,32 +345,10 @@
             });
             bdays.sort((a, b) => a.diff - b.diff);
             div.innerHTML = '<h3>Geburtstage 🎂</h3>';
-            bdays.slice(0, 3).forEach(b => {
-                div.innerHTML += `<div class="list-card"><strong>${b.name}</strong> wird ${b.age} (${b.diff === 0 ? 'HEUTE' : 'in ' + b.diff + ' Tagen'})</div>`;
+            bdays.slice(0, 5).forEach(b => {
+                const label = b.diff === 0 ? "HEUTE!" : b.diff === 1 ? "morgen" : `in ${b.diff} Tagen`;
+                div.innerHTML += `<div class="list-card"><div style="display:flex; justify-content:space-between"><div><strong>${b.name}</strong> (${b.age})<br><small>${b.date.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'})}</small></div><span style="color:var(--primary-blue); font-weight:bold">${label}</span></div></div>`;
             });
-        }
-
-        function renderContacts() {
-            const list = document.getElementById('contactsList');
-            let contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
-            list.innerHTML = '';
-            contacts.sort((a,b) => a.name.localeCompare(b.name)).forEach(c => {
-                list.innerHTML += `<div class="list-card" style="display:flex; justify-content:space-between; align-items:center;">
-                    <div><strong>${c.name}</strong><br><small>${c.phone}</small></div>
-                    <a href="tel:${c.phone}" class="call-btn" style="background:var(--success-green); color:white; width:35px; height:35px; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none;"><i class="fas fa-phone"></i></a>
-                </div>`;
-            });
-        }
-
-        function openContactModal() {
-            const name = prompt("Name:");
-            const phone = prompt("Nummer:");
-            if(name && phone) {
-                let c = JSON.parse(localStorage.getItem('familyContacts')) || [];
-                c.push({id: Date.now(), name, phone});
-                localStorage.setItem('familyContacts', JSON.stringify(c));
-                renderContacts();
-            }
         }
     </script>
 </body>
