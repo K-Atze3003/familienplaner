@@ -149,7 +149,6 @@
 
         // --- INITIALISIERUNG ---
         window.onload = function() {
-            // Automatischer Tages-Reset der Routine
             const lastDate = localStorage.getItem('lastOpenDate');
             const todayStr = new Date().toDateString();
             if (lastDate !== todayStr) {
@@ -298,7 +297,6 @@
             const today = new Date();
             today.setHours(0,0,0,0);
 
-            // Geburtstags-Berechnung
             let birthdays = contacts.filter(c => c.bday).map(c => {
                 const bDate = new Date(c.bday);
                 let nextBday = new Date(today.getFullYear(), bDate.getMonth(), bDate.getDate());
@@ -307,10 +305,13 @@
                     nextBday.setFullYear(today.getFullYear() + 1);
                 }
                 
+                // Alter berechnen
+                let age = nextBday.getFullYear() - bDate.getFullYear();
+                
                 return { 
                     name: c.name, 
                     date: nextBday, 
-                    orig: bDate,
+                    age: age,
                     diff: Math.ceil((nextBday - today) / (1000 * 60 * 60 * 24))
                 };
             });
@@ -329,8 +330,8 @@
                     <div class="list-card">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <div>
-                                <strong>${b.name}</strong><br>
-                                <small>${b.date.toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit'})}</small>
+                                <strong>${b.name}</strong> (${b.age})<br>
+                                <small>${b.date.toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit'})} • wird ${b.age}</small>
                             </div>
                             <span style="font-size:12px; font-weight:bold; color:var(--primary-blue)">${daysLabel}</span>
                         </div>
