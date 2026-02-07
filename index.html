@@ -34,50 +34,48 @@
         h1 { margin-top: 40px; font-size: 28px; color: #1c1c1e; text-align: center; }
         h3 { width: 100%; margin-top: 25px; color: #3a3a3c; border-bottom: 1px solid #d1d1d6; padding-bottom: 5px; font-size: 18px; }
 
-        .abc-header { width: 100%; padding: 5px 15px; font-weight: bold; color: #8e8e93; font-size: 14px; margin-top: 10px; text-transform: uppercase; align-self: flex-start; }
-
-        /* --- ROUTINE & SOUNDS --- */
+        /* --- ROUTINE --- */
         .progress-container { width: 100%; height: 18px; background: #e5e5ea; border-radius: 10px; margin: 20px 0; overflow: hidden; }
         #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary-blue), #5856d6); transition: width 0.4s; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
-        .card { background: white; border-radius: 20px; height: 120px; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 3px solid transparent; transition: 0.2s; -webkit-tap-highlight-color: transparent; position: relative; }
+        .card { background: white; border-radius: 20px; height: 120px; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 3px solid transparent; transition: 0.2s; -webkit-tap-highlight-color: transparent; }
         .card.done { background: var(--success-green); color: white; transform: scale(0.95); }
         .card .icon { font-size: 40px; margin-bottom: 8px; }
 
-        /* Video Overlay */
-        #videoOverlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:5000; justify-content:center; align-items:center; flex-direction:column; color: white; }
-
-        /* --- KONTAKTE & DETAILS --- */
+        /* --- LISTEN & KARTEN --- */
         .list-card { background: white; width: 100%; padding: 15px; border-radius: 18px; margin-bottom: 8px; box-sizing: border-box; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
-        .contact-main { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-        .contact-details { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid #f2f2f7; font-size: 15px; color: #333; line-height: 1.8; }
-        .contact-details.show { display: block; }
-        .contact-details p { margin: 5px 0; display: flex; align-items: center; gap: 10px; }
-        .maps-link { color: var(--primary-blue); text-decoration: none; font-weight: 500; }
-        .contact-actions { display: flex; gap: 12px; align-items: center; }
-        .call-btn { background: var(--success-green); color: white; width: 38px; height: 38px; border-radius: 19px; display: flex; align-items: center; justify-content: center; text-decoration: none; }
-        .fav-btn { color: #ccc; background: none; border: none; font-size: 20px; }
-        .fav-btn.active { color: var(--fav-yellow); }
-
-        /* --- MÜLL --- */
-        .trash-item { border-left: 6px solid #ccc; }
+        .trash-item { border-left: 6px solid #ccc; position: relative; }
         .trash-Rest { border-color: #333; }
         .trash-Bio { border-color: #8B4513; }
         .trash-Papier { border-color: #007aff; }
         .trash-Gelb { border-color: #ffcc00; }
 
-        /* --- NAV --- */
+        .delete-btn-small { background: none; border: none; color: #d1d1d6; font-size: 18px; padding: 5px; cursor: pointer; }
+        .delete-btn-small:active { color: var(--danger-red); }
+
+        /* --- CONTACTS --- */
+        .contact-details { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid #f2f2f7; font-size: 14px; }
+        .contact-details.show { display: block; }
+        .maps-link { color: var(--primary-blue); text-decoration: none; font-weight: bold; }
+
+        /* --- NAVIGATION --- */
         .tab-bar { position: fixed; bottom: 0; width: 100%; height: 85px; background: var(--tab-bar-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); display: flex; justify-content: space-around; align-items: center; border-top: 0.5px solid #d1d1d6; padding-bottom: env(safe-area-inset-bottom); z-index: 1000; }
         .tab-item { display: flex; flex-direction: column; align-items: center; color: #8e8e93; font-size: 11px; text-decoration: none; width: 33%; }
         .tab-item.active { color: var(--primary-blue); }
         .tab-item i { font-size: 24px; margin-bottom: 4px; }
-        
-        #confetti { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 100px; display: none; z-index: 6000; pointer-events: none; }
+
+        #videoOverlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:5000; justify-content:center; align-items:center; flex-direction:column; color: white; }
     </style>
 </head>
 <body>
 
-    <audio id="snd-0" src="https://raw.githubusercontent.com/K-Atze3003/familienplaner/efb3a11b069fe49080d7d99e11b8bcb69657b217/Sound%20Essen.mp3"></audio> <audio id="snd-1" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio> <audio id="snd-2" src="https://raw.githubusercontent.com/K-Atze3003/familienplaner/e78724b96faa0f070768306bc14786625aeefbe1/Sound%20Za%CC%88hneputzen.mp3"></audio> <audio id="snd-3" src="https://assets.mixkit.co/active_storage/sfx/1000/1000-preview.mp3"></audio> <audio id="snd-4" src="https://assets.mixkit.co/active_storage/sfx/2800/2800-preview.mp3"></audio> <audio id="snd-5" src="https://assets.mixkit.co/active_storage/sfx/2100/2100-preview.mp3"></audio> <audio id="finalSuccess" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
+    <audio id="snd-0" src="https://raw.githubusercontent.com/K-Atze3003/familienplaner/efb3a11b069fe49080d7d99e11b8bcb69657b217/Sound%20Essen.mp3"></audio>
+    <audio id="snd-1" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
+    <audio id="snd-2" src="https://raw.githubusercontent.com/K-Atze3003/familienplaner/e78724b96faa0f070768306bc14786625aeefbe1/Sound%20Za%CC%88hneputzen.mp3"></audio>
+    <audio id="snd-3" src="https://assets.mixkit.co/active_storage/sfx/1000/1000-preview.mp3"></audio>
+    <audio id="snd-4" src="https://assets.mixkit.co/active_storage/sfx/2800/2800-preview.mp3"></audio>
+    <audio id="snd-5" src="https://assets.mixkit.co/active_storage/sfx/2100/2100-preview.mp3"></audio>
+    <audio id="finalSuccess" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
 
     <section id="routine" class="active">
         <h1>Routine 🌙</h1>
@@ -93,24 +91,13 @@
         <button style="margin-top: 30px; background: none; border: none; color: #8e8e93;" onclick="resetRoutine(true)">Liste zurücksetzen</button>
     </section>
 
-    <div id="videoOverlay" onclick="this.style.display='none'">
-        <video id="rewardVideo" width="90%" playsinline>
-            <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
-        </video>
-        <h2 style="margin-top:20px;">Super gemacht! 🎉</h2>
-    </div>
-
     <section id="calendar">
         <h1>Kalender 📅</h1>
         <div id="trashDisplay" style="width: 100%;"></div>
-        <div style="margin-top: 15px; background: white; padding: 15px; border-radius: 18px; width: 100%; box-sizing: border-box;">
-            <h4 style="margin: 0 0 5px 0; font-size: 14px; color: #3a3a3c;">Upload-Filter:</h4>
-            <input type="text" id="filterInput" placeholder="z.B. 4-wöchentlich" onchange="saveFilter()" style="margin:0; font-size: 14px; padding: 10px;">
-        </div>
         <div id="birthdayDisplay" style="width: 100%;"></div>
-        <div style="margin-top: 20px; text-align: center; display: flex; flex-direction: column; gap: 15px;">
+        <div style="margin-top: 20px; text-align: center;">
             <input type="file" id="icsInput" style="display:none" accept=".ics" onchange="importIcs(event)">
-            <label for="icsInput" style="color: var(--primary-blue); font-size: 15px; cursor: pointer; font-weight: 500;">
+            <label for="icsInput" style="color: var(--primary-blue); font-size: 15px; cursor: pointer;">
                 <i class="fas fa-file-import"></i> Müllkalender einlesen
             </label>
         </div>
@@ -119,37 +106,30 @@
     <section id="contacts">
         <h1>Kontakte 📞</h1>
         <div id="contactsList" style="width: 100%;"></div>
-        <button class="fab" onclick="openContactModal()"><i class="fas fa-plus"></i></button>
     </section>
 
-    <nav class="tab-bar">
-        <a href="#" class="tab-item active" onclick="showTab('routine', this)">
-            <i class="fas fa-tasks"></i><span>Routine</span>
-        </a>
-        <a href="#" class="tab-item" onclick="showTab('calendar', this)">
-            <i class="fas fa-calendar-alt"></i><span>Kalender</span>
-        </a>
-        <a href="#" class="tab-item" onclick="showTab('contacts', this)">
-            <i class="fas fa-address-book"></i><span>Kontakte</span>
-        </a>
-    </nav>
+    <div id="videoOverlay" onclick="this.style.display='none'">
+        <video id="rewardVideo" width="90%" playsinline><source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4"></video>
+        <h2 style="margin-top:20px;">Super gemacht! 🎉</h2>
+    </div>
 
-    <div id="confetti">🎉</div>
+    <nav class="tab-bar">
+        <a href="#" class="tab-item active" onclick="showTab('routine', this)"><i class="fas fa-tasks"></i><span>Routine</span></a>
+        <a href="#" class="tab-item" onclick="showTab('calendar', this)"><i class="fas fa-calendar-alt"></i><span>Kalender</span></a>
+        <a href="#" class="tab-item" onclick="showTab('contacts', this)"><i class="fas fa-address-book"></i><span>Kontakte</span></a>
+    </nav>
 
     <script>
         const DELETE_PIN = "2410";
 
-        // --- NAVIGATION ---
         function showTab(id, el) {
             document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
             el.classList.add('active');
-            if(id === 'calendar') { renderTrash(); renderBirthdays(); }
-            if(id === 'contacts') { renderContacts(); }
+            if(id === 'calendar') renderTrash();
         }
 
-        // --- ROUTINE LOGIK MIT SOUNDS ---
         function toggleTask(el, i) {
             const isDone = el.classList.toggle('done');
             if(isDone) {
@@ -163,70 +143,61 @@
             const cards = document.querySelectorAll('#routine .card');
             const done = document.querySelectorAll('#routine .card.done').length;
             document.getElementById('progress-bar').style.width = (done/cards.length*100) + '%';
-            
             if(done === cards.length && done > 0) {
-                const overlay = document.getElementById('videoOverlay');
-                const video = document.getElementById('rewardVideo');
-                const confetti = document.getElementById('confetti');
-                
-                overlay.style.display = 'flex';
-                confetti.style.display = 'block';
-                video.play();
-                document.getElementById('finalSuccess').play();
-                
-                setTimeout(() => { 
-                    overlay.style.display = 'none'; 
-                    confetti.style.display = 'none';
-                    video.pause();
-                }, 8000);
+                document.getElementById('videoOverlay').style.display = 'flex';
+                document.getElementById('rewardVideo').play();
             }
         }
 
         function resetRoutine(ask) {
-            if(ask && !confirm("Routine zurücksetzen?")) return;
+            if(ask && !confirm("Zurücksetzen?")) return;
             document.querySelectorAll('#routine .card').forEach(c => c.classList.remove('done'));
             updateProgress();
         }
 
-        // --- KONTAKTE (Google Maps & Bday Fix) ---
-        function renderContacts() {
-            const list = document.getElementById('contactsList');
-            let contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
-            list.innerHTML = '';
-            contacts.sort((a,b) => a.name.localeCompare(b.name)).forEach(c => {
-                const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.addr)}`;
-                const bdayStr = c.bday ? new Date(c.bday).toLocaleDateString('de-DE') : 'Kein Datum';
-                
-                list.innerHTML += `
-                <div class="list-card">
-                    <div class="contact-main">
-                        <div onclick="this.parentElement.nextElementSibling.classList.toggle('show')" style="flex-grow:1">
-                            <strong>${c.name}</strong><br><small>${c.rel || 'Kontakt'}</small>
+        // --- MÜLL LOGIK MIT EINZELLÖSCHUNG ---
+        function renderTrash() {
+            const div = document.getElementById('trashDisplay');
+            const data = JSON.parse(localStorage.getItem('trashData')) || [];
+            const today = new Date().toISOString().split('T')[0].replace(/-/g,'');
+            
+            div.innerHTML = '<h3>Müllabfuhr 🗑️</h3>';
+            
+            const upcoming = data.filter(x => x.d >= today).slice(0, 6);
+            if(upcoming.length === 0) div.innerHTML += '<p style="color:#888; font-size:13px">Keine Termine vorhanden.</p>';
+
+            upcoming.forEach((x, index) => {
+                let cls = x.s.includes('Bio')?'trash-Bio':x.s.includes('Papier')?'trash-Papier':x.s.includes('Gelb')?'trash-Gelb':'trash-Rest';
+                div.innerHTML += `
+                    <div class="list-card trash-item ${cls}">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <strong>${x.s}</strong><br>
+                                <small>${x.d.slice(6,8)}.${x.d.slice(4,6)}.${x.d.slice(0,4)}</small>
+                            </div>
+                            <button class="delete-btn-small" onclick="deleteTrashEntry('${x.d}', '${x.s}')">
+                                <i class="fas fa-times-circle"></i>
+                            </button>
                         </div>
-                        <div class="contact-actions">
-                            <a href="tel:${c.phone}" class="call-btn"><i class="fas fa-phone"></i></a>
-                        </div>
-                    </div>
-                    <div class="contact-details">
-                        <p><i class="fas fa-birthday-cake"></i> ${bdayStr}</p>
-                        ${c.addr ? `<p><i class="fas fa-map-marker-alt"></i> <a href="${mapsUrl}" target="_blank" class="maps-link">${c.addr}</a></p>` : ''}
-                        <button onclick="deleteContactWithPin(${c.id})" style="color:red; background:none; border:none; font-size:12px; margin-top:10px;">Löschen</button>
-                    </div>
-                </div>`;
+                    </div>`;
             });
         }
 
-        // --- HILFSFUNKTIONEN (Müll, Filter, etc.) ---
-        function saveFilter() { localStorage.setItem('trashFilter', document.getElementById('filterInput').value); }
-        window.onload = function() { 
-            document.getElementById('filterInput').value = localStorage.getItem('trashFilter') || "4-wöchentlich";
-            renderContacts(); 
-        };
+        function deleteTrashEntry(date, summary) {
+            const pin = prompt("Bitte Lösch-PIN eingeben:");
+            if (pin === DELETE_PIN) {
+                let data = JSON.parse(localStorage.getItem('trashData')) || [];
+                // Filtere genau diesen einen Eintrag heraus
+                data = data.filter(x => !(x.d === date && x.s === summary));
+                localStorage.setItem('trashData', JSON.stringify(data));
+                renderTrash();
+            } else if (pin !== null) {
+                alert("Falsche PIN!");
+            }
+        }
 
-        // --- (Restliche Müll-Logik wie gehabt) ---
         function importIcs(e) {
             const file = e.target.files[0];
-            const filter = (document.getElementById('filterInput').value || "").toLowerCase().split(',').map(s=>s.trim());
             const reader = new FileReader();
             reader.onload = function(f) {
                 const lines = f.target.result.split(/\r?\n/);
@@ -236,8 +207,7 @@
                     else if(l.startsWith('SUMMARY:')) cur.s = l.replace('SUMMARY:','').trim();
                     else if(l.startsWith('DTSTART')) cur.d = (l.match(/\d{8}/) || [])[0];
                     else if(l.startsWith('END:VEVENT') && cur.s && cur.d) {
-                        const sL = cur.s.toLowerCase();
-                        if(sL.match(/müll|abfuhr|tonne|papier|gelb|bio/) && !filter.some(f => sL.includes(f))) events.push(cur);
+                        if(cur.s.toLowerCase().match(/müll|abfuhr|tonne|papier|gelb|bio/)) events.push(cur);
                     }
                 });
                 localStorage.setItem('trashData', JSON.stringify(events.sort((a,b)=>a.d.localeCompare(b.d))));
@@ -246,32 +216,10 @@
             reader.readAsText(file);
         }
 
-        function renderTrash() {
-            const div = document.getElementById('trashDisplay');
-            const data = JSON.parse(localStorage.getItem('trashData')) || [];
-            div.innerHTML = '<h3>Müllabfuhr 🗑️</h3>';
-            data.filter(x => x.d >= new Date().toISOString().split('T')[0].replace(/-/g,'')).slice(0, 5).forEach(x => {
-                let cls = x.s.includes('Bio')?'trash-Bio':x.s.includes('Papier')?'trash-Papier':x.s.includes('Gelb')?'trash-Gelb':'trash-Rest';
-                div.innerHTML += `<div class="list-card trash-item ${cls}"><strong>${x.s}</strong><br><small>${x.d.slice(6,8)}.${x.d.slice(4,6)}.${x.d.slice(0,4)}</small></div>`;
-            });
-        }
-
-        function renderBirthdays() {
-            const div = document.getElementById('birthdayDisplay');
-            const contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
-            div.innerHTML = '<h3>Geburtstage 🎂</h3>';
-            contacts.filter(c => c.bday).slice(0,3).forEach(b => {
-                div.innerHTML += `<div class="list-card"><strong>${b.name}</strong> am ${new Date(b.bday).toLocaleDateString('de-DE')}</div>`;
-            });
-        }
-
-        function deleteContactWithPin(id) {
-            if(prompt("PIN:") === DELETE_PIN) {
-                let c = JSON.parse(localStorage.getItem('familyContacts'));
-                localStorage.setItem('familyContacts', JSON.stringify(c.filter(x => x.id !== id)));
-                renderContacts();
-            }
-        }
+        window.onload = function() {
+            renderTrash();
+            // Kontakte & Geburtstage Logik hier initialisieren falls Daten vorhanden
+        };
     </script>
 </body>
 </html>
