@@ -44,8 +44,28 @@
         .card.done { background: var(--success-green); color: white; transform: scale(0.95); }
         .card .icon { font-size: 40px; margin-bottom: 8px; }
 
-        /* --- KARTEN --- */
+        /* --- KARTEN & DETAILS --- */
         .list-card { background: white; width: 100%; padding: 15px; border-radius: 18px; margin-bottom: 8px; box-sizing: border-box; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
+        
+        .contact-main { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        .contact-details { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid #f2f2f7; font-size: 15px; color: #333; line-height: 1.8; }
+        .contact-details.show { display: block; }
+        .contact-details p { margin: 5px 0; display: flex; align-items: center; gap: 10px; }
+        .contact-details i { color: #8e8e93; width: 20px; text-align: center; }
+        
+        /* Links in den Details */
+        .maps-link { color: var(--primary-blue); text-decoration: none; font-weight: 500; }
+        .phone-link { color: #333; text-decoration: none; }
+
+        .contact-actions { display: flex; gap: 12px; align-items: center; }
+        .call-btn { background: var(--success-green); color: white; width: 38px; height: 38px; border-radius: 19px; display: flex; align-items: center; justify-content: center; text-decoration: none; }
+        .fav-btn { color: #ccc; background: none; border: none; font-size: 20px; }
+        .fav-btn.active { color: var(--fav-yellow); }
+        
+        .detail-footer-actions { display: flex; justify-content: flex-end; gap: 15px; margin-top: 15px; padding-top: 10px; border-top: 1px solid #f9f9f9; }
+        .edit-btn { color: var(--primary-blue); background: none; border: none; font-size: 14px; font-weight: 500; }
+        .del-btn-text { color: var(--danger-red); background: none; border: none; font-size: 14px; font-weight: 500; }
+
         .fab { position: fixed; right: 20px; bottom: 100px; width: 56px; height: 56px; background: var(--primary-blue); color: white; border-radius: 28px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 12px rgba(0,122,255,0.3); z-index: 500; border: none; }
 
         /* --- MODAL --- */
@@ -55,18 +75,6 @@
 
         input { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #d1d1d6; border-radius: 12px; font-size: 16px; box-sizing: border-box; background: #f9f9f9; }
         .save-btn { width: 100%; background: var(--primary-blue); color: white; border: none; padding: 16px; border-radius: 15px; font-weight: bold; font-size: 16px; margin-top: 10px; }
-
-        /* --- KONTAKTE DETAILS --- */
-        .contact-main { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-        .contact-details { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid #f2f2f7; font-size: 14px; color: #666; line-height: 1.6; }
-        .contact-details.show { display: block; }
-        .contact-actions { display: flex; gap: 12px; align-items: center; }
-        .call-btn { background: var(--success-green); color: white; width: 38px; height: 38px; border-radius: 19px; display: flex; align-items: center; justify-content: center; text-decoration: none; }
-        .fav-btn { color: #ccc; background: none; border: none; font-size: 20px; }
-        .fav-btn.active { color: var(--fav-yellow); }
-        .detail-footer-actions { display: flex; justify-content: flex-end; gap: 15px; margin-top: 10px; }
-        .edit-btn { color: var(--primary-blue); background: none; border: none; font-size: 14px; }
-        .del-btn-text { color: var(--danger-red); background: none; border: none; font-size: 14px; }
 
         /* --- MÜLL --- */
         .trash-item { border-left: 6px solid #ccc; }
@@ -136,8 +144,11 @@
             <input type="text" id="cName" placeholder="Name">
             <input type="tel" id="cPhone" placeholder="Telefonnummer">
             <input type="text" id="cRel" placeholder="Beziehung">
-            <input type="date" id="cBday">
-            <input type="text" id="cAddr" placeholder="Adresse">
+            <div style="display:flex; align-items:center; gap:10px; margin: 8px 0;">
+                <span style="color:#666;">Geburtstag:</span>
+                <input type="date" id="cBday" style="margin:0; flex-grow:1">
+            </div>
+            <input type="text" id="cAddr" placeholder="Adresse (Straße, Ort)">
             <button class="save-btn" onclick="saveContact()">Speichern</button>
         </div>
     </div>
@@ -251,6 +262,9 @@
         }
 
         function createContactHTML(c) {
+            const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.addr)}`;
+            const bdayStr = c.bday ? new Date(c.bday).toLocaleDateString('de-DE') : '';
+            
             return `
             <div class="list-card">
                 <div class="contact-main">
@@ -263,8 +277,10 @@
                     </div>
                 </div>
                 <div class="contact-details">
-                    <p><i class="fas fa-phone-alt"></i> ${c.phone}</p>
-                    ${c.addr?`<p><i class="fas fa-map-marker-alt"></i> ${c.addr}</p>`:''}
+                    <p><i class="fas fa-phone-alt"></i> <a href="tel:${c.phone}" class="phone-link">${c.phone}</a></p>
+                    ${c.bday ? `<p><i class="fas fa-birthday-cake"></i> ${bdayStr}</p>` : ''}
+                    ${c.addr ? `<p><i class="fas fa-map-marker-alt"></i> <a href="${mapsUrl}" target="_blank" class="maps-link">${c.addr} &nbsp;<i class="fas fa-external-link-alt" style="font-size:12px"></i></a></p>` : ''}
+                    
                     <div class="detail-footer-actions">
                         <button class="edit-btn" onclick="openContactModal(${c.id})">Bearbeiten</button>
                         <button class="del-btn-text" onclick="deleteContactWithPin(${c.id})">Löschen</button>
@@ -315,8 +331,25 @@
             const div = document.getElementById('trashDisplay');
             const data = JSON.parse(localStorage.getItem('trashData')) || [];
             const today = new Date().toISOString().split('T')[0].replace(/-/g,'');
+            const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
+            const tomorrowStr = tomorrow.toISOString().split('T')[0].replace(/-/g,'');
+            
             div.innerHTML = '<h3>Müllabfuhr 🗑️</h3>';
-            data.filter(x => x.d >= today).slice(0, 5).forEach(x => {
+            
+            // Warnung für Morgen
+            const forTomorrow = data.find(x => x.d === tomorrowStr);
+            if(forTomorrow) {
+                div.innerHTML += `
+                    <div style="background: var(--danger-red); color: white; padding: 15px; border-radius: 15px; margin-bottom: 15px; animation: pulse 2s infinite;">
+                        <i class="fas fa-exclamation-triangle"></i> <strong>HEUTE RAUSSTELLEN:</strong><br>
+                        Morgen wird <strong>${forTomorrow.s}</strong> abgeholt!
+                    </div>`;
+            }
+
+            const next = data.filter(x => x.d >= today).slice(0, 5);
+            if(next.length === 0) { div.innerHTML += '<p style="color:#888; font-size:13px">Keine Termine vorhanden.</p>'; return; }
+
+            next.forEach(x => {
                 let cls = x.s.includes('Bio')?'trash-Bio':x.s.includes('Papier')?'trash-Papier':x.s.includes('Gelb')?'trash-Gelb':'trash-Rest';
                 div.innerHTML += `<div class="list-card trash-item ${cls}"><div style="display:flex; justify-content:space-between"><div><strong>${x.s}</strong><br><small>${x.d.slice(6,8)}.${x.d.slice(4,6)}.${x.d.slice(0,4)}</small></div><button onclick="deleteSingleTrashWithPin('${x.d}','${x.s}')" style="background:none;border:none;color:#ddd">×</button></div></div>`;
             });
