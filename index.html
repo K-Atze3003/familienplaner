@@ -320,6 +320,31 @@
         }
 
         function renderTrash() {
+             const div = document.getElementById('trashDisplay');
+             const data = JSON.parse(localStorage.getItem('trashData')) || [];
+             const today = new Date();
+             const tomorrow = new Date(today);
+             tomorrow.setDate(today.getDate() + 1);
+    
+             const tomorrowStr = tomorrow.toISOString().split('T')[0].replace(/-/g,'');
+             const todayStr = today.toISOString().split('T')[0].replace(/-/g,'');
+    
+             const nextEvents = data.filter(x => x.d >= todayStr).slice(0, 4);
+    
+             div.innerHTML = '<h3>Müllabfuhr 🗑️</h3>';
+    
+             // Prüfen, ob morgen etwas ansteht
+             const forTomorrow = data.find(x => x.d === tomorrowStr);
+             if(forTomorrow) {
+             div.innerHTML += `
+            <div style="background: var(--danger-red); color: white; padding: 15px; border-radius: 15px; margin-bottom: 15px; animation: pulse 2s infinite;">
+                <i class="fas fa-exclamation-triangle"></i> <strong>HEUTE RAUSSTELLEN:</strong><br>
+                Morgen wird <strong>${forTomorrow.s}</strong> abgeholt!
+            </div>
+        `;
+    }
+}
+
             const div = document.getElementById('trashDisplay');
             const data = JSON.parse(localStorage.getItem('trashData')) || [];
             const today = new Date().toISOString().split('T')[0].replace(/-/g,'');
