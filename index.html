@@ -25,6 +25,7 @@
             margin: 0;
             padding-bottom: 100px;
             -webkit-user-select: none;
+            overflow-x: hidden;
         }
 
         /* Navigations-Logik */
@@ -47,9 +48,18 @@
         /* --- KONTAKTE & KALENDER CARDS --- */
         .list-card { background: white; width: 100%; padding: 15px; border-radius: 20px; margin-bottom: 12px; box-sizing: border-box; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         
-        .input-group { background: white; width: 100%; padding: 15px; border-radius: 20px; margin-bottom: 20px; box-sizing: border-box; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        input { width: 100%; padding: 12px; margin: 6px 0; border: 1px solid #d1d1d6; border-radius: 10px; font-size: 16px; box-sizing: border-box; }
-        .add-btn { width: 100%; background: var(--primary-blue); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: bold; font-size: 16px; margin-top: 10px; }
+        /* Floating Action Button */
+        .fab { position: fixed; right: 20px; bottom: 100px; width: 60px; height: 60px; background: var(--primary-blue); color: white; border-radius: 30px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 15px rgba(0,122,255,0.4); z-index: 500; transition: transform 0.2s; border: none; }
+        .fab:active { transform: scale(0.85); }
+
+        /* Overlay für Kontakt-Eingabe */
+        #contactModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: flex-end; }
+        .modal-content { background: white; width: 100%; padding: 30px 20px; border-radius: 25px 25px 0 0; box-sizing: border-box; animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+        input { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #d1d1d6; border-radius: 12px; font-size: 16px; box-sizing: border-box; background: #f9f9f9; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .save-btn { width: 100%; background: var(--primary-blue); color: white; border: none; padding: 16px; border-radius: 15px; font-weight: bold; font-size: 16px; margin-top: 15px; }
 
         .contact-main { display: flex; justify-content: space-between; align-items: center; width: 100%; }
         .contact-details { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee; font-size: 14px; color: #666; }
@@ -71,12 +81,12 @@
         .upload-area { border: 2px dashed var(--primary-blue); padding: 15px; border-radius: 15px; text-align: center; margin-bottom: 20px; width: 100%; box-sizing: border-box; }
 
         /* --- TAB BAR --- */
-        .tab-bar { position: fixed; bottom: 0; width: 100%; height: 80px; background: var(--tab-bar-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); display: flex; justify-content: space-around; align-items: center; border-top: 0.5px solid #d1d1d6; padding-bottom: env(safe-area-inset-bottom); z-index: 1000; }
+        .tab-bar { position: fixed; bottom: 0; width: 100%; height: 85px; background: var(--tab-bar-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); display: flex; justify-content: space-around; align-items: center; border-top: 0.5px solid #d1d1d6; padding-bottom: env(safe-area-inset-bottom); z-index: 1000; }
         .tab-item { display: flex; flex-direction: column; align-items: center; color: #8e8e93; font-size: 11px; text-decoration: none; width: 33%; }
         .tab-item.active { color: var(--primary-blue); }
         .tab-item i { font-size: 24px; margin-bottom: 4px; }
 
-        #confetti { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 100px; display: none; z-index: 2000; pointer-events: none; }
+        #confetti { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 100px; display: none; z-index: 3000; pointer-events: none; }
     </style>
 </head>
 <body>
@@ -97,31 +107,36 @@
 
     <section id="calendar">
         <h1>Kalender 📅</h1>
-        
         <div id="trashDisplay" style="width: 100%;"></div>
-        
         <div class="upload-area" style="margin-top: 10px;">
             <input type="file" id="icsInput" style="display:none" accept=".ics" onchange="importIcs(event)">
             <label for="icsInput" style="color: var(--primary-blue); font-size: 14px; cursor: pointer;">
                 <i class="fas fa-file-import"></i> Müllkalender (.ics) aktualisieren
             </label>
         </div>
-
         <div id="birthdayDisplay" style="width: 100%;"></div>
     </section>
 
     <section id="contacts">
         <h1>Kontakte 📞</h1>
-        <div class="input-group">
+        <div id="contactsList" style="width: 100%;"></div>
+        <button class="fab" onclick="openContactModal()"><i class="fas fa-plus"></i></button>
+    </section>
+
+    <div id="contactModal" onclick="closeContactModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2 style="margin:0">Neuer Kontakt</h2>
+                <button onclick="closeContactModal()" style="border:none; background:none; font-size:24px; color:#8e8e93">&times;</button>
+            </div>
             <input type="text" id="cName" placeholder="Name">
             <input type="tel" id="cPhone" placeholder="Telefonnummer">
             <input type="text" id="cRel" placeholder="Beziehung (z.B. Familie)">
             <input type="date" id="cBday">
             <input type="text" id="cAddr" placeholder="Adresse">
-            <button class="add-btn" onclick="addNewContact()">Kontakt speichern</button>
+            <button class="save-btn" onclick="addNewContact()">Speichern</button>
         </div>
-        <div id="contactsList" style="width: 100%;"></div>
-    </section>
+    </div>
 
     <nav class="tab-bar">
         <a href="#" class="tab-item active" onclick="showTab('routine', this)">
@@ -138,7 +153,6 @@
     <div id="confetti">🎉</div>
 
     <script>
-        // --- NAVIGATION ---
         function showTab(id, el) {
             document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
@@ -147,7 +161,6 @@
             if(id === 'calendar') { renderTrash(); renderBirthdays(); }
         }
 
-        // --- INITIALISIERUNG ---
         window.onload = function() {
             const lastDate = localStorage.getItem('lastOpenDate');
             const todayStr = new Date().toDateString();
@@ -155,13 +168,16 @@
                 resetRoutine(false);
                 localStorage.setItem('lastOpenDate', todayStr);
             }
-
             const routine = JSON.parse(localStorage.getItem('routineState')) || [false, false, false, false, false, false];
             const cards = document.querySelectorAll('#routine .card');
             cards.forEach((c, i) => { if(routine[i]) c.classList.add('done'); });
             updateProgress();
             renderContacts();
         };
+
+        // --- MODAL LOGIK ---
+        function openContactModal() { document.getElementById('contactModal').style.display = 'flex'; }
+        function closeContactModal(e) { document.getElementById('contactModal').style.display = 'none'; }
 
         // --- ROUTINE LOGIK ---
         function toggleTask(el, i) {
@@ -195,7 +211,6 @@
             const name = document.getElementById('cName').value;
             const phone = document.getElementById('cPhone').value;
             if(!name || !phone) return alert("Name und Nummer fehlen!");
-            
             const contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
             contacts.push({
                 id: Date.now(),
@@ -207,6 +222,7 @@
             });
             localStorage.setItem('familyContacts', JSON.stringify(contacts));
             ["cName","cPhone","cRel","cBday","cAddr"].forEach(id => document.getElementById(id).value = '');
+            closeContactModal();
             renderContacts();
         }
 
@@ -214,7 +230,6 @@
             const list = document.getElementById('contactsList');
             let contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
             contacts.sort((a,b) => (b.fav === a.fav) ? 0 : b.fav ? 1 : -1);
-            
             list.innerHTML = '';
             contacts.forEach(c => {
                 list.innerHTML += `
@@ -235,8 +250,7 @@
                             ${c.bday ? `<p><strong>Geburtstag:</strong> ${new Date(c.bday).toLocaleDateString('de-DE')}</p>` : ''}
                             ${c.addr ? `<p><strong>Adresse:</strong> ${c.addr}</p>` : ''}
                         </div>
-                    </div>
-                `;
+                    </div>`;
             });
         }
 
@@ -256,7 +270,7 @@
             }
         }
 
-        // --- KALENDER & ICAL LOGIK ---
+        // --- KALENDER LOGIK ---
         function importIcs(e) {
             const reader = new FileReader();
             reader.onload = function(f) {
@@ -282,9 +296,8 @@
             const data = JSON.parse(localStorage.getItem('trashData')) || [];
             const today = new Date().toISOString().split('T')[0].replace(/-/g,'');
             const next = data.filter(x => x.d >= today).slice(0, 4);
-            
             div.innerHTML = '<h3>Müllabfuhr 🗑️</h3>';
-            if(!next.length) div.innerHTML += '<p style="color:#888; font-size:13px">Noch keine Termine geladen.</p>';
+            if(!next.length) div.innerHTML += '<p style="color:#888; font-size:13px">Keine Termine geladen.</p>';
             next.forEach(x => {
                 let cls = x.s.includes('Bio')?'trash-Bio':x.s.includes('Papier')?'trash-Papier':x.s.includes('Gelb')?'trash-Gelb':'trash-Rest';
                 div.innerHTML += `<div class="list-card trash-item ${cls}"><strong>${x.s}</strong><br><small>${x.d.slice(6,8)}.${x.d.slice(4,6)}.${x.d.slice(0,4)}</small></div>`;
@@ -296,46 +309,19 @@
             const contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
             const today = new Date();
             today.setHours(0,0,0,0);
-
-            let birthdays = contacts.filter(c => c.bday).map(c => {
+            let bdays = contacts.filter(c => c.bday).map(c => {
                 const bDate = new Date(c.bday);
-                let nextBday = new Date(today.getFullYear(), bDate.getMonth(), bDate.getDate());
-                
-                if (nextBday < today) {
-                    nextBday.setFullYear(today.getFullYear() + 1);
-                }
-                
-                // Alter berechnen
-                let age = nextBday.getFullYear() - bDate.getFullYear();
-                
-                return { 
-                    name: c.name, 
-                    date: nextBday, 
-                    age: age,
-                    diff: Math.ceil((nextBday - today) / (1000 * 60 * 60 * 24))
-                };
+                let next = new Date(today.getFullYear(), bDate.getMonth(), bDate.getDate());
+                if (next < today) next.setFullYear(today.getFullYear() + 1);
+                let age = next.getFullYear() - bDate.getFullYear();
+                return { name: c.name, date: next, age: age, diff: Math.ceil((next - today) / (1000 * 60 * 60 * 24)) };
             });
-
-            birthdays.sort((a, b) => a.diff - b.diff);
-
-            div.innerHTML = '<h3>Anstehende Geburtstage 🎂</h3>';
-            if(!birthdays.length) {
-                div.innerHTML += '<p style="color:#888; font-size:13px">Keine Daten vorhanden.</p>';
-                return;
-            }
-
-            birthdays.slice(0, 5).forEach(b => {
+            bdays.sort((a, b) => a.diff - b.diff);
+            div.innerHTML = '<h3>Geburtstage 🎂</h3>';
+            if(!bdays.length) { div.innerHTML += '<p style="color:#888; font-size:13px">Keine Daten vorhanden.</p>'; return; }
+            bdays.slice(0, 5).forEach(b => {
                 const daysLabel = b.diff === 0 ? "HEUTE! 🥳" : b.diff === 1 ? "morgen" : `in ${b.diff} Tagen`;
-                div.innerHTML += `
-                    <div class="list-card">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <div>
-                                <strong>${b.name}</strong> (${b.age})<br>
-                                <small>${b.date.toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit'})} • wird ${b.age}</small>
-                            </div>
-                            <span style="font-size:12px; font-weight:bold; color:var(--primary-blue)">${daysLabel}</span>
-                        </div>
-                    </div>`;
+                div.innerHTML += `<div class="list-card"><div style="display:flex; justify-content:space-between; align-items:center;"><div><strong>${b.name}</strong> (${b.age})<br><small>${b.date.toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit'})} • wird ${b.age}</small></div><span style="font-size:12px; font-weight:bold; color:var(--primary-blue)">${daysLabel}</span></div></div>`;
             });
         }
     </script>
