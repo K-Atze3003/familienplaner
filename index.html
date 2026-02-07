@@ -36,7 +36,6 @@
 
         .abc-header { width: 100%; padding: 5px 15px; font-weight: bold; color: #8e8e93; font-size: 14px; margin-top: 10px; text-transform: uppercase; align-self: flex-start; }
 
-        /* --- ROUTINE STYLE --- */
         .progress-container { width: 100%; height: 18px; background: #e5e5ea; border-radius: 10px; margin: 20px 0; overflow: hidden; }
         #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary-blue), #5856d6); transition: width 0.4s; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
@@ -44,7 +43,6 @@
         .card.done { background: var(--success-green); color: white; transform: scale(0.95); }
         .card .icon { font-size: 40px; margin-bottom: 8px; }
 
-        /* --- KONTAKTE & LISTEN --- */
         .list-card { background: white; width: 100%; padding: 15px; border-radius: 18px; margin-bottom: 8px; box-sizing: border-box; box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
         
         .fab { position: fixed; right: 20px; bottom: 100px; width: 56px; height: 56px; background: var(--primary-blue); color: white; border-radius: 28px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 12px rgba(0,122,255,0.3); z-index: 500; border: none; }
@@ -60,7 +58,6 @@
         .contact-details { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid #f2f2f7; font-size: 14px; color: #666; line-height: 1.6; }
         .contact-details.show { display: block; }
         
-        /* Buttons & Actions */
         .contact-actions { display: flex; gap: 12px; align-items: center; }
         .detail-footer-actions { display: flex; justify-content: flex-end; gap: 15px; margin-top: 15px; border-top: 1px solid #f2f2f7; padding-top: 10px; }
         
@@ -82,6 +79,7 @@
         .tab-item.active { color: var(--primary-blue); }
         .tab-item i { font-size: 24px; margin-bottom: 4px; }
 
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
         #confetti { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 100px; display: none; z-index: 3000; pointer-events: none; }
     </style>
 </head>
@@ -105,11 +103,14 @@
         <h1>Kalender 📅</h1>
         <div id="trashDisplay" style="width: 100%;"></div>
         <div id="birthdayDisplay" style="width: 100%;"></div>
-        <div style="margin-top: 20px; text-align: center;">
+        <div style="margin-top: 20px; text-align: center; display: flex; flex-direction: column; gap: 10px;">
             <input type="file" id="icsInput" style="display:none" accept=".ics" onchange="importIcs(event)">
             <label for="icsInput" style="color: var(--primary-blue); font-size: 13px; cursor: pointer;">
-                <i class="fas fa-file-import"></i> Müllkalender aktualisieren
+                <i class="fas fa-file-import"></i> Datei einlesen (überschreibt alte)
             </label>
+            <button onclick="clearTrashData()" style="background:none; border:none; color:var(--danger-red); font-size:11px;">
+                <i class="fas fa-trash-alt"></i> Alle Müll-Daten löschen
+            </button>
         </div>
     </section>
 
@@ -150,7 +151,7 @@
     <div id="confetti">🎉</div>
 
     <script>
-        const DELETE_PIN = "2410"; // <--- HIER DEINE PIN ÄNDERN
+        const DELETE_PIN = "2410";
 
         function showTab(id, el) {
             document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
@@ -310,8 +311,14 @@
                 lines.forEach(l => {
                     if(l.startsWith('BEGIN:VEVENT')) cur = {};
                     else if(l.startsWith('SUMMARY:')) cur.s = l.replace('SUMMARY:','').trim();
-                    else if(l.startsWith('DTSTART')) cur.d = l.match(/\d{8}/)?.[0];
-                    else if(l.startsWith('END:VEVENT')) { if(cur.s.toLowerCase().match(/müll|abfuhr|tonne/)) events.push(cur); cur = null; }
+                    else if(l.startsWith('DTSTART')) {
+                        const m = l.match(/\d{8}/);
+                        if(m) cur.d = m[0];
+                    }
+                    else if(l.startsWith('END:VEVENT')) {
+                        if(cur && cur.s && cur.d && cur.s.toLowerCase().match(/müll|abfuhr|tonne|biomüll|gelber|papier/)) events.push(cur);
+                        cur = null;
+                    }
                 });
                 localStorage.setItem('trashData', JSON.stringify(events.sort((a,b)=>a.d.localeCompare(b.d))));
                 renderTrash();
@@ -319,38 +326,42 @@
             reader.readAsText(e.target.files[0]);
         }
 
-        function renderTrash() {
-             const div = document.getElementById('trashDisplay');
-             const data = JSON.parse(localStorage.getItem('trashData')) || [];
-             const today = new Date();
-             const tomorrow = new Date(today);
-             tomorrow.setDate(today.getDate() + 1);
-    
-             const tomorrowStr = tomorrow.toISOString().split('T')[0].replace(/-/g,'');
-             const todayStr = today.toISOString().split('T')[0].replace(/-/g,'');
-    
-             const nextEvents = data.filter(x => x.d >= todayStr).slice(0, 4);
-    
-             div.innerHTML = '<h3>Müllabfuhr 🗑️</h3>';
-    
-             // Prüfen, ob morgen etwas ansteht
-             const forTomorrow = data.find(x => x.d === tomorrowStr);
-             if(forTomorrow) {
-             div.innerHTML += `
-            <div style="background: var(--danger-red); color: white; padding: 15px; border-radius: 15px; margin-bottom: 15px; animation: pulse 2s infinite;">
-                <i class="fas fa-exclamation-triangle"></i> <strong>HEUTE RAUSSTELLEN:</strong><br>
-                Morgen wird <strong>${forTomorrow.s}</strong> abgeholt!
-            </div>
-        `;
-    }
-}
+        function clearTrashData() {
+            if(confirm("Müll-Daten wirklich löschen?")) {
+                localStorage.removeItem('trashData');
+                renderTrash();
+            }
+        }
 
+        function renderTrash() {
             const div = document.getElementById('trashDisplay');
             const data = JSON.parse(localStorage.getItem('trashData')) || [];
-            const today = new Date().toISOString().split('T')[0].replace(/-/g,'');
-            const next = data.filter(x => x.d >= today).slice(0, 4);
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(today.getDate() + 1);
+            
+            const todayStr = today.toISOString().split('T')[0].replace(/-/g,'');
+            const tomorrowStr = tomorrow.toISOString().split('T')[0].replace(/-/g,'');
+            
             div.innerHTML = '<h3>Müllabfuhr 🗑️</h3>';
-            if(!next.length) div.innerHTML += '<p style="color:#888; font-size:13px">Keine Termine geladen.</p>';
+            
+            // 1. Warnung für Morgen
+            const forTomorrow = data.find(x => x.d === tomorrowStr);
+            if(forTomorrow) {
+                div.innerHTML += `
+                    <div style="background: var(--danger-red); color: white; padding: 15px; border-radius: 15px; margin-bottom: 15px; animation: pulse 2s infinite;">
+                        <i class="fas fa-exclamation-triangle"></i> <strong>HEUTE RAUSSTELLEN:</strong><br>
+                        Morgen wird <strong>${forTomorrow.s}</strong> abgeholt!
+                    </div>`;
+            }
+
+            // 2. Liste anzeigen
+            const next = data.filter(x => x.d >= todayStr).slice(0, 4);
+            if(!next.length) {
+                div.innerHTML += '<p style="color:#888; font-size:13px">Keine Termine geladen.</p>';
+                return;
+            }
+            
             next.forEach(x => {
                 let cls = x.s.includes('Bio')?'trash-Bio':x.s.includes('Papier')?'trash-Papier':x.s.includes('Gelb')?'trash-Gelb':'trash-Rest';
                 div.innerHTML += `<div class="list-card trash-item ${cls}"><strong>${x.s}</strong><br><small>${x.d.slice(6,8)}.${x.d.slice(4,6)}.${x.d.slice(0,4)}</small></div>`;
