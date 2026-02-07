@@ -6,6 +6,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>FamilyHub Pro</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <style>
         :root {
             --bg-color: #f0f2f5;
@@ -13,57 +16,71 @@
             --success-green: #34c759;
             --danger-red: #ff3b30;
             --fav-yellow: #ffcc00;
-            --tab-bar-bg: rgba(255, 255, 255, 0.8);
+            --tab-bar-bg: rgba(255, 255, 255, 0.85);
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-color);
             margin: 0;
-            padding-bottom: 90px;
+            padding-bottom: 100px;
+            -webkit-user-select: none;
         }
 
-        section { display: none; padding: 20px; animation: fadeIn 0.3s ease; }
-        section.active { display: flex; flex-direction: column; align-items: center; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        /* Navigations-Logik */
+        section { display: none; padding: 20px; animation: fadeIn 0.3s ease; flex-direction: column; align-items: center; }
+        section.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        h1 { margin-top: 40px; font-size: 28px; color: #1c1c1e; }
+        h1 { margin-top: 40px; font-size: 28px; color: #1c1c1e; text-align: center; }
+        h3 { width: 100%; margin-top: 20px; color: #3a3a3c; border-bottom: 1px solid #d1d1d6; padding-bottom: 5px; }
 
-        /* ROUTINE STYLE */
-        .progress-container { width: 90%; height: 15px; background: #e5e5ea; border-radius: 10px; margin: 20px 0; overflow: hidden; }
-        #progress-bar { width: 0%; height: 100%; background: var(--primary-blue); transition: width 0.4s; }
+        /* --- ROUTINE STYLE --- */
+        .progress-container { width: 100%; height: 18px; background: #e5e5ea; border-radius: 10px; margin: 20px 0; overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
+        #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary-blue), #5856d6); transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
-        .card { background: white; border-radius: 20px; height: 130px; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 3px solid transparent; transition: 0.2s; -webkit-tap-highlight-color: transparent; }
+        .card { background: white; border-radius: 20px; height: 130px; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 3px solid transparent; transition: 0.2s; -webkit-tap-highlight-color: transparent; }
         .card.done { background: var(--success-green); color: white; transform: scale(0.95); }
-        .card .icon { font-size: 40px; margin-bottom: 5px; }
+        .card .icon { font-size: 45px; margin-bottom: 8px; }
+        .card .label { font-weight: bold; font-size: 15px; }
 
-        /* KONTAKTE FORM & CARDS */
+        /* --- KONTAKTE & KALENDER CARDS --- */
+        .list-card { background: white; width: 100%; padding: 15px; border-radius: 20px; margin-bottom: 12px; box-sizing: border-box; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        
+        /* Eingabeformulare */
         .input-group { background: white; width: 100%; padding: 15px; border-radius: 20px; margin-bottom: 20px; box-sizing: border-box; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        input, select { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #d1d1d6; border-radius: 10px; font-size: 16px; box-sizing: border-box; }
-        .add-btn { width: 100%; background: var(--primary-blue); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; margin-top: 10px; }
-        
-        .contact-card { background: white; width: 100%; padding: 15px; border-radius: 20px; margin-bottom: 12px; box-sizing: border-box; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: 0.3s; }
-        .contact-main { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-        .contact-info { display: flex; flex-direction: column; }
-        .contact-actions { display: flex; align-items: center; gap: 12px; }
-        
-        .contact-details { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee; font-size: 14px; color: #666; line-height: 1.6; }
+        input { width: 100%; padding: 12px; margin: 6px 0; border: 1px solid #d1d1d6; border-radius: 10px; font-size: 16px; box-sizing: border-box; }
+        .add-btn { width: 100%; background: var(--primary-blue); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: bold; font-size: 16px; margin-top: 10px; }
+
+        /* Kontakt Details */
+        .contact-main { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        .contact-details { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee; font-size: 14px; color: #666; animation: fadeIn 0.2s; }
         .contact-details.show { display: block; }
+        .contact-actions { display: flex; gap: 10px; align-items: center; }
         
-        .call-btn { background: var(--success-green); color: white; padding: 8px 15px; border-radius: 20px; text-decoration: none; font-weight: bold; font-size: 13px; }
-        .fav-btn { color: #ccc; background: none; border: none; font-size: 20px; }
+        /* Buttons */
+        .call-btn { background: var(--success-green); color: white; width: 40px; height: 40px; border-radius: 20px; display: flex; align-items: center; justify-content: center; text-decoration: none; }
+        .fav-btn { color: #ccc; background: none; border: none; font-size: 22px; }
         .fav-btn.active { color: var(--fav-yellow); }
-        .del-btn { color: var(--danger-red); background: none; border: none; font-size: 16px; margin-left: 5px;}
+        .del-btn { color: var(--danger-red); background: none; border: none; font-size: 18px; }
 
-        /* TAB BAR */
-        .tab-bar { position: fixed; bottom: 0; width: 100%; height: 75px; background: var(--tab-bar-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; justify-content: space-around; align-items: center; border-top: 0.5px solid #d1d1d6; padding-bottom: env(safe-area-inset-bottom); }
-        .tab-item { display: flex; flex-direction: column; align-items: center; color: #8e8e93; font-size: 10px; text-decoration: none; width: 33%; }
+        /* Müllkalender Farben */
+        .trash-item { border-left: 6px solid #ccc; }
+        .trash-Rest { border-color: #333; }
+        .trash-Bio { border-color: #8B4513; }
+        .trash-Papier { border-color: #007aff; }
+        .trash-Gelb { border-color: #ffcc00; }
+
+        .upload-area { border: 2px dashed var(--primary-blue); padding: 15px; border-radius: 15px; text-align: center; margin-bottom: 20px; width: 100%; box-sizing: border-box; }
+
+        /* --- TAB BAR --- */
+        .tab-bar { position: fixed; bottom: 0; width: 100%; height: 80px; background: var(--tab-bar-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); display: flex; justify-content: space-around; align-items: center; border-top: 0.5px solid #d1d1d6; padding-bottom: env(safe-area-inset-bottom); z-index: 1000; }
+        .tab-item { display: flex; flex-direction: column; align-items: center; color: #8e8e93; font-size: 11px; text-decoration: none; width: 33%; }
         .tab-item.active { color: var(--primary-blue); }
-        .tab-item i { font-size: 22px; margin-bottom: 4px; }
+        .tab-item i { font-size: 24px; margin-bottom: 4px; }
 
-        #confetti { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 80px; display: none; z-index: 100; pointer-events: none; }
+        #confetti { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 100px; display: none; z-index: 2000; pointer-events: none; }
     </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
@@ -78,128 +95,132 @@
             <div class="card" onclick="toggleTask(this, 4)"><span class="icon">🧺</span><span class="label">Wäschesack</span></div>    
             <div class="card" onclick="toggleTask(this, 5)"><span class="icon">🪮</span><span class="label">Haarekämmen</span></div>
         </div>
-        <div id="confetti">🎉</div>
+        <button style="margin-top: 30px; background: none; border: none; color: #8e8e93;" onclick="resetRoutine()">Liste zurücksetzen</button>
     </section>
 
     <section id="calendar">
         <h1>Kalender 📅</h1>
-        <div id="birthdayList" style="width: 100%;"></div>
-        <div class="contact-card"><div><strong>Morgen:</strong> Restmüll 🗑️</div></div>
+        
+        <div class="upload-area">
+            <input type="file" id="icsInput" style="display:none" accept=".ics" onchange="importIcs(event)">
+            <label for="icsInput" style="color: var(--primary-blue); font-weight: bold; cursor: pointer;">
+                <i class="fas fa-file-import"></i> Müllkalender (.ics) einspielen
+            </label>
+        </div>
+
+        <div id="trashDisplay" style="width: 100%;"></div>
+        <div id="birthdayDisplay" style="width: 100%;"></div>
     </section>
 
     <section id="contacts">
         <h1>Kontakte 📞</h1>
         <div class="input-group">
-            <input type="text" id="contactName" placeholder="Name">
-            <input type="tel" id="contactPhone" placeholder="Telefonnummer">
-            <input type="text" id="contactRelation" placeholder="Beziehung (z.B. Familie, Arzt)">
-            <input type="date" id="contactBday" placeholder="Geburtstag">
-            <input type="text" id="contactAddress" placeholder="Adresse">
-            <button class="add-btn" onclick="saveNewContact()">Kontakt hinzufügen</button>
+            <input type="text" id="cName" placeholder="Name">
+            <input type="tel" id="cPhone" placeholder="Telefonnummer">
+            <input type="text" id="cRel" placeholder="Beziehung (z.B. Familie)">
+            <input type="date" id="cBday">
+            <input type="text" id="cAddr" placeholder="Adresse">
+            <button class="add-btn" onclick="addNewContact()">Kontakt speichern</button>
         </div>
         <div id="contactsList" style="width: 100%;"></div>
     </section>
 
     <nav class="tab-bar">
         <a href="#" class="tab-item active" onclick="showTab('routine', this)">
-            <i class="fas fa-check-circle"></i><span>Routine</span>
+            <i class="fas fa-tasks"></i><span>Routine</span>
         </a>
         <a href="#" class="tab-item" onclick="showTab('calendar', this)">
             <i class="fas fa-calendar-alt"></i><span>Kalender</span>
         </a>
         <a href="#" class="tab-item" onclick="showTab('contacts', this)">
-            <i class="fas fa-phone-alt"></i><span>Kontakte</span>
+            <i class="fas fa-address-book"></i><span>Kontakte</span>
         </a>
     </nav>
 
+    <div id="confetti">🎉</div>
+
     <script>
-        function showTab(tabId, element) {
+        // --- NAVIGATION ---
+        function showTab(id, el) {
             document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
+            document.getElementById(id).classList.add('active');
             document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-            element.classList.add('active');
-            if(tabId === 'calendar') renderBirthdays();
+            el.classList.add('active');
+            if(id === 'calendar') { renderTrash(); renderBirthdays(); }
         }
 
+        // --- INITIALISIERUNG ---
         window.onload = function() {
-            const savedRoutine = JSON.parse(localStorage.getItem('routineState')) || [false, false, false, false, false, false];
+            // Routine
+            const routine = JSON.parse(localStorage.getItem('routineState')) || [false, false, false, false, false, false];
             const cards = document.querySelectorAll('#routine .card');
-            cards.forEach((card, index) => { if (savedRoutine[index]) card.classList.add('done'); });
+            cards.forEach((c, i) => { if(routine[i]) c.classList.add('done'); });
             updateProgress();
+            // Kontakte
             renderContacts();
         };
 
-        function toggleTask(element, index) {
-            element.classList.toggle('done');
+        // --- ROUTINE LOGIK ---
+        function toggleTask(el, i) {
+            el.classList.toggle('done');
             const cards = document.querySelectorAll('#routine .card');
-            const state = Array.from(cards).map(card => card.classList.contains('done'));
+            const state = Array.from(cards).map(c => c.classList.contains('done'));
             localStorage.setItem('routineState', JSON.stringify(state));
             updateProgress();
-            if (navigator.vibrate) navigator.vibrate(40);
+            if(navigator.vibrate) navigator.vibrate(40);
         }
 
         function updateProgress() {
             const cards = document.querySelectorAll('#routine .card');
             const done = document.querySelectorAll('#routine .card.done').length;
             document.getElementById('progress-bar').style.width = (done/cards.length*100) + '%';
-            if (done === cards.length && done > 0) {
+            if(done === cards.length && done > 0) {
                 document.getElementById('confetti').style.display = 'block';
                 setTimeout(() => { document.getElementById('confetti').style.display = 'none'; }, 3000);
             }
         }
 
-        // --- KONTAKTE LOGIK ---
-        function saveNewContact() {
-            const name = document.getElementById('contactName').value;
-            const phone = document.getElementById('contactPhone').value;
-            const relation = document.getElementById('contactRelation').value;
-            const bday = document.getElementById('contactBday').value;
-            const addr = document.getElementById('contactAddress').value;
-
-            if (name && phone) {
-                let contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
-                contacts.push({ name, phone, relation, bday, addr, fav: false, id: Date.now() });
-                localStorage.setItem('familyContacts', JSON.stringify(contacts));
-                ["contactName", "contactPhone", "contactRelation", "contactBday", "contactAddress"].forEach(id => document.getElementById(id).value = '');
-                renderContacts();
+        function resetRoutine() {
+            if(confirm("Routine für heute zurücksetzen?")) {
+                document.querySelectorAll('#routine .card').forEach(c => c.classList.remove('done'));
+                localStorage.setItem('routineState', JSON.stringify([false,false,false,false,false,false]));
+                updateProgress();
             }
         }
 
-        function toggleFav(id) {
-            let contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
-            const index = contacts.findIndex(c => c.id === id);
-            contacts[index].fav = !contacts[index].fav;
+        // --- KONTAKTE LOGIK ---
+        function addNewContact() {
+            const name = document.getElementById('cName').value;
+            const phone = document.getElementById('cPhone').value;
+            if(!name || !phone) return alert("Name und Nummer fehlen!");
+            
+            const contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
+            contacts.push({
+                id: Date.now(),
+                name, phone, 
+                rel: document.getElementById('cRel').value,
+                bday: document.getElementById('cBday').value,
+                addr: document.getElementById('cAddr').value,
+                fav: false
+            });
             localStorage.setItem('familyContacts', JSON.stringify(contacts));
+            ["cName","cPhone","cRel","cBday","cAddr"].forEach(id => document.getElementById(id).value = '');
             renderContacts();
-        }
-
-        function deleteContact(id) {
-            if(!confirm("Löschen?")) return;
-            let contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
-            contacts = contacts.filter(c => c.id !== id);
-            localStorage.setItem('familyContacts', JSON.stringify(contacts));
-            renderContacts();
-        }
-
-        function toggleDetails(id) {
-            document.getElementById('details-' + id).classList.toggle('show');
         }
 
         function renderContacts() {
             const list = document.getElementById('contactsList');
             let contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
-            
-            // Sortierung: Favoriten zuerst
-            contacts.sort((a, b) => (b.fav === a.fav) ? 0 : b.fav ? 1 : -1);
+            contacts.sort((a,b) => (b.fav === a.fav) ? 0 : b.fav ? 1 : -1);
             
             list.innerHTML = '';
-            contacts.forEach((c) => {
+            contacts.forEach(c => {
                 list.innerHTML += `
-                    <div class="contact-card">
+                    <div class="list-card">
                         <div class="contact-main">
-                            <div class="contact-info" onclick="toggleDetails(${c.id})">
-                                <strong>${c.fav ? '⭐ ' : ''}${c.name}</strong>
-                                <small>${c.relation || 'Kontakt'}</small>
+                            <div onclick="document.getElementById('det-${c.id}').classList.toggle('show')">
+                                <strong>${c.fav ? '⭐ ' : ''}${c.name}</strong><br>
+                                <small>${c.rel || 'Kontakt'}</small>
                             </div>
                             <div class="contact-actions">
                                 <a href="tel:${c.phone}" class="call-btn"><i class="fas fa-phone"></i></a>
@@ -207,8 +228,8 @@
                                 <button class="del-btn" onclick="deleteContact(${c.id})"><i class="fas fa-trash"></i></button>
                             </div>
                         </div>
-                        <div id="details-${c.id}" class="contact-details">
-                            <p><strong>Telefon:</strong> ${c.phone}</p>
+                        <div id="det-${c.id}" class="contact-details">
+                            <p><strong>Nummer:</strong> ${c.phone}</p>
                             ${c.bday ? `<p><strong>Geburtstag:</strong> ${new Date(c.bday).toLocaleDateString('de-DE')}</p>` : ''}
                             ${c.addr ? `<p><strong>Adresse:</strong> ${c.addr}</p>` : ''}
                         </div>
@@ -217,20 +238,65 @@
             });
         }
 
+        function toggleFav(id) {
+            let c = JSON.parse(localStorage.getItem('familyContacts'));
+            let i = c.findIndex(x => x.id === id);
+            c[i].fav = !c[i].fav;
+            localStorage.setItem('familyContacts', JSON.stringify(c));
+            renderContacts();
+        }
+
+        function deleteContact(id) {
+            if(confirm("Löschen?")) {
+                let c = JSON.parse(localStorage.getItem('familyContacts'));
+                localStorage.setItem('familyContacts', JSON.stringify(c.filter(x => x.id !== id)));
+                renderContacts();
+            }
+        }
+
+        // --- KALENDER & ICAL LOGIK ---
+        function importIcs(e) {
+            const reader = new FileReader();
+            reader.onload = function(f) {
+                const lines = f.target.result.split(/\r?\n/);
+                let events = [], cur = null;
+                lines.forEach(l => {
+                    if(l.startsWith('BEGIN:VEVENT')) cur = {};
+                    else if(l.startsWith('SUMMARY:')) cur.s = l.replace('SUMMARY:','').trim();
+                    else if(l.startsWith('DTSTART')) cur.d = l.match(/\d{8}/)?.[0];
+                    else if(l.startsWith('END:VEVENT')) {
+                        if(cur.s.toLowerCase().match(/müll|abfuhr|tonne/)) events.push(cur);
+                        cur = null;
+                    }
+                });
+                localStorage.setItem('trashData', JSON.stringify(events.sort((a,b)=>a.d.localeCompare(b.d))));
+                renderTrash();
+            };
+            reader.readAsText(e.target.files[0]);
+        }
+
+        function renderTrash() {
+            const div = document.getElementById('trashDisplay');
+            const data = JSON.parse(localStorage.getItem('trashData')) || [];
+            const today = new Date().toISOString().split('T')[0].replace(/-/g,'');
+            const next = data.filter(x => x.d >= today).slice(0, 4);
+            
+            div.innerHTML = '<h3>Müllabfuhr 🗑️</h3>';
+            if(!next.length) div.innerHTML += '<p style="color:#888; font-size:14px">Keine Termine. Bitte .ics Datei laden.</p>';
+            next.forEach(x => {
+                let cls = x.s.includes('Bio')?'trash-Bio':x.s.includes('Papier')?'trash-Papier':x.s.includes('Gelb')?'trash-Gelb':'trash-Rest';
+                div.innerHTML += `<div class="list-card trash-item ${cls}"><strong>${x.s}</strong><br><small>${x.d.slice(6,8)}.${x.d.slice(4,6)}.${x.d.slice(0,4)}</small></div>`;
+            });
+        }
+
         function renderBirthdays() {
-            const bdayContainer = document.getElementById('birthdayList');
-            const contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
-            const upcoming = contacts.filter(c => c.bday);
-            
-            bdayContainer.innerHTML = '<h3>Geburtstage 🎂</h3>';
-            if(upcoming.length === 0) bdayContainer.innerHTML += '<p>Keine Geburtstage hinterlegt.</p>';
-            
-            upcoming.forEach(c => {
-                bdayContainer.innerHTML += `
-                    <div class="contact-card">
-                        <div><strong>${c.name}</strong><br><small>Geburtstag am: ${new Date(c.bday).toLocaleDateString('de-DE')}</small></div>
-                    </div>
-                `;
+            const div = document.getElementById('birthdayDisplay');
+            const c = JSON.parse(localStorage.getItem('familyContacts')) || [];
+            const bd = c.filter(x => x.bday).sort((a,b) => a.bday.slice(5) > b.bday.slice(5) ? 1 : -1);
+            div.innerHTML = '<h3>Geburtstage 🎂</h3>';
+            if(!bd.length) div.innerHTML += '<p style="color:#888; font-size:14px">Keine Geburtstage gespeichert.</p>';
+            bd.forEach(x => {
+                div.innerHTML += `<div class="list-card"><strong>${x.name}</strong><br><small>am ${new Date(x.bday).toLocaleDateString('de-DE')}</small></div>`;
             });
         }
     </script>
