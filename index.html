@@ -16,9 +16,8 @@
             --success-green: #34c759;
             --danger-red: #ff3b30;
             --fav-yellow: #ffcc00;
-            --tab-bar-bg: rgba(255, 255, 255, 0.85);
+            --tab-bar-bg: rgba(255, 255, 255, 0.95);
             --ios-gray: #f2f2f7;
-            --separator: #c6c6c8;
         }
 
         body {
@@ -30,7 +29,7 @@
             user-select: none;
         }
 
-        /* --- ALLGEMEINES LAYOUT --- */
+        /* --- LAYOUT & ANIMATION --- */
         section { display: none; padding: 20px; animation: fadeIn 0.3s ease; flex-direction: column; align-items: center; }
         section.active { display: flex; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -38,7 +37,7 @@
         h1 { margin-top: 40px; font-size: 28px; color: #1c1c1e; text-align: center; font-weight: 700; }
         h3 { width: 100%; margin-top: 25px; color: #3a3a3c; border-bottom: 1px solid #d1d1d6; padding-bottom: 5px; font-size: 18px; font-weight: 600; }
 
-        /* --- ROUTINE & SOUNDS --- */
+        /* --- ROUTINE --- */
         .progress-container { width: 100%; height: 18px; background: #e5e5ea; border-radius: 10px; margin: 20px 0; overflow: hidden; }
         #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary-blue), #5856d6); transition: width 0.4s; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
@@ -46,15 +45,19 @@
         .card.done { background: var(--success-green); color: white; transform: scale(0.95); }
         .card .icon { font-size: 40px; margin-bottom: 8px; }
 
-        /* --- KALENDER & MÜLL --- */
+        /* --- KALENDER --- */
         .trash-item { border-left: 6px solid #ccc; }
         .trash-Rest { border-color: #333; }
         .trash-Bio { border-color: #8B4513; }
         .trash-Papier { border-color: #007aff; }
         .trash-Gelb { border-color: #ffcc00; }
 
-        /* --- KONTAKTE & LISTE --- */
-        .list-card { background: white; width: 100%; padding: 15px; border-radius: 18px; margin-bottom: 8px; box-sizing: border-box; box-shadow: 0 2px 6px rgba(0,0,0,0.04); position: relative; }
+        /* --- KONTAKTE & KARTEN STIL --- */
+        .list-card { 
+            background: white; width: 100%; padding: 15px; border-radius: 18px; margin-bottom: 10px; box-sizing: border-box; 
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04); position: relative; display: flex; flex-direction: column; justify-content: center;
+        }
+        
         .contact-main { display: flex; justify-content: space-between; align-items: center; width: 100%; }
         .contact-details { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid #f2f2f7; font-size: 15px; color: #333; line-height: 1.8; }
         .contact-details.show { display: block; }
@@ -63,53 +66,60 @@
         
         .call-btn { background: var(--success-green); color: white; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 18px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         
-        /* Floating Action Button (Plus) */
-        .fab { position: fixed; bottom: 100px; right: 20px; background: var(--primary-blue); color: white; width: 56px; height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 12px rgba(0,122,255,0.4); border: none; cursor: pointer; z-index: 900; }
+        /* FAB (Plus Button) */
+        .fab { position: fixed; bottom: 100px; right: 20px; background: var(--primary-blue); color: white; width: 56px; height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 12px rgba(0,122,255,0.4); border: none; cursor: pointer; z-index: 900; transition: transform 0.2s; }
+        .fab:active { transform: scale(0.9); }
 
-        /* --- APPLE STYLE MODAL (NEU) --- */
+        /* --- NEUES MODAL (KARTEN DESIGN) --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); z-index: 2000;
+            background: rgba(0,0,0,0.6); z-index: 2000;
             display: none; align-items: flex-end; justify-content: center;
-            opacity: 0; transition: opacity 0.3s;
+            opacity: 0; transition: opacity 0.3s; backdrop-filter: blur(4px);
         }
         .modal-overlay.active { opacity: 1; }
         
         .modal-sheet {
-            background: var(--ios-gray);
-            width: 100%; height: 92%; max-width: 600px;
-            border-radius: 16px 16px 0 0;
+            background: var(--bg-color); /* Gleiche Farbe wie App-Hintergrund */
+            width: 100%; height: 85%; max-width: 600px;
+            border-radius: 20px 20px 0 0;
             transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
             display: flex; flex-direction: column; overflow: hidden;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
         }
         .modal-overlay.active .modal-sheet { transform: translateY(0); }
 
         .modal-header {
-            height: 56px; background: white;
+            height: 60px; background: white;
             display: flex; justify-content: space-between; align-items: center;
-            padding: 0 16px; border-bottom: 0.5px solid #c6c6c8; flex-shrink: 0;
+            padding: 0 20px; border-bottom: 0.5px solid #d1d1d6; flex-shrink: 0;
         }
-        .modal-header button { background: none; border: none; font-size: 17px; cursor: pointer; padding: 10px; }
-        .cancel-btn { color: var(--primary-blue); }
-        .save-btn { color: var(--primary-blue); font-weight: 600; }
-        .modal-title { font-weight: 600; font-size: 17px; }
+        .modal-header button { background: none; border: none; font-size: 16px; cursor: pointer; padding: 10px; font-weight: 500; }
+        .cancel-btn { color: #8e8e93; }
+        .save-btn { color: var(--primary-blue); font-weight: 700; font-size: 17px !important; }
 
-        .modal-body { padding: 24px 16px; overflow-y: auto; flex-grow: 1; }
+        .modal-body { padding: 25px 20px; overflow-y: auto; flex-grow: 1; }
 
-        .profile-placeholder {
-            width: 80px; height: 80px; background: #e5e5ea; border-radius: 50%;
-            margin: 0 auto 24px auto; display: flex; justify-content: center; align-items: center;
-            color: #aeaeb2; font-size: 32px;
+        /* Eingabefelder im Karten-Look */
+        .input-card {
+            background: white; border-radius: 18px; padding: 15px; margin-bottom: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04); display: flex; align-items: center;
         }
-
-        .input-group { background: white; border-radius: 12px; margin-bottom: 24px; overflow: hidden; }
-        .input-row { display: flex; align-items: center; min-height: 48px; padding-left: 16px; border-bottom: 0.5px solid var(--separator); }
-        .input-row:last-child { border-bottom: none; }
         
-        .input-row input {
-            flex-grow: 1; border: none; font-size: 17px; padding: 14px 16px 14px 0; outline: none; -webkit-appearance: none; background: transparent;
+        /* Spezieller Style für die Namenskarte (wie in Übersicht) */
+        .name-card {
+            display: flex; flex-direction: column; align-items: flex-start;
         }
-        .input-row label { width: 100px; font-size: 16px; color: #333; }
+        .inp-big {
+            font-size: 18px; font-weight: bold; border: none; width: 100%; outline: none; margin-bottom: 5px;
+        }
+        .inp-small {
+            font-size: 14px; color: #8e8e93; border: none; width: 100%; outline: none;
+        }
+        
+        /* Icons in Eingabefeldern */
+        .inp-icon { width: 30px; text-align: center; font-size: 18px; margin-right: 15px; }
+        .inp-std { border: none; font-size: 16px; width: 100%; outline: none; background: transparent; height: 100%; }
 
         /* --- NAV --- */
         .tab-bar { position: fixed; bottom: 0; width: 100%; height: 85px; background: var(--tab-bar-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); display: flex; justify-content: space-around; align-items: center; border-top: 0.5px solid #d1d1d6; padding-bottom: env(safe-area-inset-bottom); z-index: 1000; }
@@ -117,7 +127,6 @@
         .tab-item.active { color: var(--primary-blue); }
         .tab-item i { font-size: 24px; margin-bottom: 4px; }
         
-        /* Video Overlay */
         #videoOverlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:5000; justify-content:center; align-items:center; flex-direction:column; color: white; }
         #confetti { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 100px; display: none; z-index: 6000; pointer-events: none; }
     </style>
@@ -196,42 +205,33 @@
         <div class="modal-sheet">
             <div class="modal-header">
                 <button onclick="closeContactModal()" class="cancel-btn">Abbrechen</button>
-                <span class="modal-title">Neuer Kontakt</span>
-                <button onclick="saveContact()" class="save-btn">Fertig</button>
+                <span style="font-weight: 600; color: #1c1c1e;">Neuer Kontakt</span>
+                <button onclick="saveContact()" class="save-btn">Speichern</button>
             </div>
             
             <div class="modal-body">
-                <div class="profile-placeholder">
-                    <i class="fas fa-camera"></i>
+                <div class="input-card name-card">
+                    <input type="text" id="inpName" class="inp-big" placeholder="Vorname & Nachname">
+                    <input type="text" id="inpRel" class="inp-small" placeholder="Beziehung (z.B. Mama, Opa)">
                 </div>
 
-                <div class="input-group">
-                    <div class="input-row">
-                        <input type="text" id="inpName" placeholder="Vorname Nachname">
-                    </div>
-                    <div class="input-row">
-                        <input type="text" id="inpRel" placeholder="Beziehung (z.B. Oma, Freund)">
-                    </div>
+                <div class="input-card">
+                    <i class="fas fa-phone inp-icon" style="color: var(--success-green);"></i>
+                    <input type="tel" id="inpPhone" class="inp-std" placeholder="Telefonnummer">
                 </div>
 
-                <div class="input-group">
-                    <div class="input-row">
-                        <input type="tel" id="inpPhone" placeholder="Telefonnummer">
-                    </div>
-                    <div class="input-row">
-                        <input type="text" id="inpAddr" placeholder="Adresse (Straße, Ort)">
-                    </div>
+                <div class="input-card">
+                    <i class="fas fa-map-marker-alt inp-icon" style="color: var(--primary-blue);"></i>
+                    <input type="text" id="inpAddr" class="inp-std" placeholder="Adresse (Straße, Ort)">
                 </div>
 
-                <div class="input-group">
-                    <div class="input-row">
-                        <label>Geburtstag</label>
-                        <input type="date" id="inpBday" style="text-align: right; color: var(--primary-blue);">
-                    </div>
+                <div class="input-card">
+                    <i class="fas fa-birthday-cake inp-icon" style="color: #ff2d55;"></i>
+                    <input type="date" id="inpBday" class="inp-std" style="color: #333;">
                 </div>
-                
-                <p style="text-align: center; color: #8e8e93; font-size: 13px; margin-top: 10px;">
-                    Kontakte werden nur auf diesem Gerät gespeichert.
+
+                <p style="text-align: center; color: #999; font-size: 12px; margin-top: 20px;">
+                    Die Eingabe sieht jetzt genau so aus wie die Anzeige.
                 </p>
             </div>
         </div>
@@ -240,7 +240,7 @@
     <script>
         const DELETE_PIN = "2410";
 
-        // --- NAVIGATION ---
+        // --- NAV ---
         function showTab(id, el) {
             document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
@@ -256,7 +256,7 @@
             const isDone = el.classList.toggle('done');
             if(isDone) {
                 const snd = document.getElementById('snd-' + i);
-                if(snd) { snd.currentTime = 0; snd.play().catch(e => console.log("Audio blockiert")); }
+                if(snd) { snd.currentTime = 0; snd.play().catch(()=>{}); }
             }
             updateProgress();
         }
@@ -275,7 +275,6 @@
                 confetti.style.display = 'block';
                 video.play();
                 document.getElementById('finalSuccess').play().catch(()=>{});
-                
                 setTimeout(closeVideo, 8000);
             }
         }
@@ -283,18 +282,16 @@
         function closeVideo() {
             document.getElementById('videoOverlay').style.display = 'none';
             document.getElementById('confetti').style.display = 'none';
-            const v = document.getElementById('rewardVideo');
-            v.pause();
-            v.currentTime = 0;
+            document.getElementById('rewardVideo').pause();
         }
 
         function resetRoutine(ask) {
-            if(ask && !confirm("Möchtest du die Routine wirklich zurücksetzen?")) return;
+            if(ask && !confirm("Routine zurücksetzen?")) return;
             document.querySelectorAll('#routine .card').forEach(c => c.classList.remove('done'));
             document.getElementById('progress-bar').style.width = '0%';
         }
 
-        // --- KONTAKTE (MODAL & LOGIK) ---
+        // --- KONTAKTE MODAL & LOGIK ---
         
         function openContactModal() {
             // Felder leeren
@@ -325,7 +322,7 @@
                 rel: document.getElementById('inpRel').value,
                 phone: document.getElementById('inpPhone').value,
                 addr: document.getElementById('inpAddr').value,
-                bday: document.getElementById('inpBday').value // Format YYYY-MM-DD
+                bday: document.getElementById('inpBday').value
             };
 
             let contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
@@ -342,18 +339,16 @@
             list.innerHTML = '';
             
             if(contacts.length === 0) {
-                list.innerHTML = '<p style="text-align:center; color:#999; margin-top:40px;">Noch keine Kontakte.<br>Drücke auf +</p>';
+                list.innerHTML = '<p style="text-align:center; color:#999; margin-top:40px;">Liste leer.<br>Tippe auf das Plus!</p>';
                 return;
             }
 
             contacts.sort((a,b) => a.name.localeCompare(b.name)).forEach(c => {
-                // Fixer Maps Link
                 const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.addr)}`;
                 
-                // Datum schön machen
                 let bdayDisplay = 'Kein Datum';
                 if(c.bday) {
-                    const parts = c.bday.split('-'); // YYYY-MM-DD
+                    const parts = c.bday.split('-');
                     if(parts.length === 3) bdayDisplay = `${parts[2]}.${parts[1]}.${parts[0]}`;
                 }
 
@@ -393,11 +388,10 @@
             }
         }
 
-        // --- KALENDER & MÜLL LOGIK ---
+        // --- KALENDER LOGIK ---
         
         function saveFilter() { 
             localStorage.setItem('trashFilter', document.getElementById('filterInput').value); 
-            // Direkt neu rendern, falls Müll schon geladen ist
             renderTrash();
         }
 
@@ -405,7 +399,6 @@
             const file = e.target.files[0];
             if(!file) return;
 
-            // Filter holen und säubern
             const filterStr = document.getElementById('filterInput').value || "";
             const filterList = filterStr.toLowerCase().split(',').map(s=>s.trim()).filter(s=>s!=="");
 
@@ -418,28 +411,23 @@
                     if(l.startsWith('BEGIN:VEVENT')) cur = {};
                     else if(l.startsWith('SUMMARY:')) cur.s = l.replace('SUMMARY:','').trim();
                     else if(l.startsWith('DTSTART')) {
-                        const match = l.match(/(\d{8})/); // Holt YYYYMMDD
+                        const match = l.match(/(\d{8})/); 
                         if(match) cur.d = match[1];
                     }
                     else if(l.startsWith('END:VEVENT') && cur && cur.s && cur.d) {
                         const sLow = cur.s.toLowerCase();
-                        // 1. Ist es Müll?
                         const isTrash = /müll|abfuhr|tonne|papier|gelb|bio|rest|wertstoff/.test(sLow);
-                        // 2. Ist es ausgefiltert?
                         const isBlocked = filterList.some(badWord => sLow.includes(badWord));
-                        
-                        if(isTrash && !isBlocked) {
-                            events.push(cur);
-                        }
+                        if(isTrash && !isBlocked) events.push(cur);
                     }
                 });
                 
                 if(events.length > 0) {
                     localStorage.setItem('trashData', JSON.stringify(events.sort((a,b)=>a.d.localeCompare(b.d))));
                     renderTrash();
-                    alert(`${events.length} Termine erfolgreich importiert!`);
+                    alert(`${events.length} Termine importiert!`);
                 } else {
-                    alert("Keine passenden Müll-Termine gefunden.");
+                    alert("Keine Termine gefunden.");
                 }
             };
             reader.readAsText(file);
@@ -450,8 +438,8 @@
             const data = JSON.parse(localStorage.getItem('trashData')) || [];
             div.innerHTML = '<h3>Müllabfuhr 🗑️</h3>';
             
-            const today = new Date().toISOString().split('T')[0].replace(/-/g,''); // YYYYMMDD
-            const upcoming = data.filter(x => x.d >= today).slice(0, 5); // Nächste 5
+            const today = new Date().toISOString().split('T')[0].replace(/-/g,'');
+            const upcoming = data.filter(x => x.d >= today).slice(0, 5);
             
             if(upcoming.length === 0) {
                 div.innerHTML += '<p style="color:#8e8e93; font-size:14px; text-align:center;">Keine Termine.</p>';
@@ -462,7 +450,7 @@
                 let cls = 'trash-Rest'; 
                 const s = x.s.toLowerCase();
                 if(s.includes('bio') || s.includes('braun')) cls = 'trash-Bio';
-                else if(s.includes('papier') || s.includes('blau') || s.includes('grün')) cls = 'trash-Papier';
+                else if(s.includes('papier') || s.includes('blau')) cls = 'trash-Papier';
                 else if(s.includes('gelb') || s.includes('wert')) cls = 'trash-Gelb';
 
                 const dNice = `${x.d.slice(6,8)}.${x.d.slice(4,6)}.${x.d.slice(0,4)}`;
@@ -479,22 +467,18 @@
             const contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
             div.innerHTML = '<h3>Geburtstage 🎂</h3>';
             
-            // Kontakte mit Geburtstag finden
             const withBday = contacts.filter(c => c.bday);
-            
             if(withBday.length === 0) {
-                div.innerHTML += '<p style="color:#8e8e93; font-size:14px; text-align:center;">Keine Geburtstage eingetragen.</p>';
+                div.innerHTML += '<p style="color:#8e8e93; font-size:14px; text-align:center;">Keine eingetragen.</p>';
                 return;
             }
 
-            // Optional: Hier könnte man noch sortieren, wer als nächstes Geburtstag hat
-            // Fürs Erste einfache Liste (max 3)
             withBday.slice(0, 5).forEach(b => {
                 const parts = b.bday.split('-');
                 const dNice = `${parts[2]}.${parts[1]}.`;
-                div.innerHTML += `<div class="list-card" style="padding:10px 15px;">
+                div.innerHTML += `<div class="list-card" style="flex-direction:row; justify-content:space-between; align-items:center;">
                     <strong>${b.name}</strong> 
-                    <span style="float:right; color:#8e8e93;">${dNice}</span>
+                    <span style="color:#8e8e93;">${dNice}</span>
                 </div>`;
             });
         }
@@ -504,7 +488,6 @@
             const savedFilter = localStorage.getItem('trashFilter');
             if(savedFilter) document.getElementById('filterInput').value = savedFilter;
             
-            // Start Tab Logik (falls Seite neu geladen wird, bleibt man auf Tab oder geht zu Routine)
             if(document.getElementById('contacts').classList.contains('active')) renderContacts();
             else if(document.getElementById('calendar').classList.contains('active')) { renderTrash(); renderBirthdays(); }
         };
