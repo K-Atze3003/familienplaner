@@ -73,6 +73,50 @@
         .tab-item i { font-size: 24px; margin-bottom: 4px; }
         
         #confetti { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 100px; display: none; z-index: 6000; pointer-events: none; }
+    
+        /* --- APPLE STYLE MODAL --- */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5); z-index: 9000;
+    display: none; opacity: 0; transition: opacity 0.3s;
+    align-items: flex-end; /* Sheet kommt von unten */
+}
+.modal-overlay.active { display: flex; opacity: 1; }
+
+.modal-sheet {
+    background: #f2f2f7; /* iOS System Gray */
+    width: 100%; height: 90%; /* Fast Vollbild */
+    border-radius: 15px 15px 0 0;
+    transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    display: flex; flex-direction: column;
+}
+.modal-overlay.active .modal-sheet { transform: translateY(0); }
+
+.modal-header {
+    height: 50px; background: white; border-radius: 15px 15px 0 0;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0 15px; border-bottom: 0.5px solid #c6c6c8;
+}
+.cancel-btn { color: var(--primary-blue); background: none; border: none; font-size: 17px; cursor: pointer; }
+.save-btn { color: var(--primary-blue); background: none; border: none; font-size: 17px; font-weight: 600; cursor: pointer; }
+
+.modal-body { padding: 20px; overflow-y: auto; }
+
+.profile-placeholder {
+    width: 80px; height: 80px; background: #e5e5ea; border-radius: 50%;
+    margin: 0 auto 20px auto; display: flex; justify-content: center; align-items: center;
+    color: #aeaeb2; font-size: 30px;
+}
+
+.input-group {
+    background: white; border-radius: 10px; overflow: hidden; margin-bottom: 20px;
+}
+.input-group input {
+    width: 100%; padding: 12px 15px; font-size: 17px; border: none; outline: none; box-sizing: border-box;
+}
+.divider { height: 1px; background: #c6c6c8; margin-left: 15px; }
+.date-row { display: flex; align-items: center; padding: 5px 15px 5px 0; min-height: 44px; }
+
     </style>
 </head>
 <body>
@@ -136,6 +180,42 @@
 
     <div id="confetti">🎉</div>
 
+    //------Kontakt "Modal Sheet" eingabe
+<div id="contactModal" class="modal-overlay">
+    <div class="modal-sheet">
+        <div class="modal-header">
+            <button onclick="closeContactModal()" class="cancel-btn">Abbrechen</button>
+            <span style="font-weight: 600;">Neuer Kontakt</span>
+            <button onclick="saveContact()" class="save-btn">Fertig</button>
+        </div>
+        
+        <div class="modal-body">
+            <div class="profile-placeholder">
+                <i class="fas fa-camera"></i>
+            </div>
+
+            <div class="input-group">
+                <input type="text" id="inpName" placeholder="Vorname & Nachname">
+                <div class="divider"></div>
+                <input type="text" id="inpRel" placeholder="Beziehung (z.B. Oma, Papa)">
+            </div>
+
+            <div class="input-group">
+                <input type="tel" id="inpPhone" placeholder="Telefon (Mobil)">
+                <div class="divider"></div>
+                <input type="text" id="inpAddr" placeholder="Adresse (für Navi)">
+            </div>
+
+            <div class="input-group">
+                <div class="date-row">
+                    <span style="flex-grow:1; margin-left:15px;">Geburtstag</span>
+                    <input type="date" id="inpBday" style="border:none; background:transparent; text-align:right;">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
     <script>
     const DELETE_PIN = "2410";
 
@@ -194,30 +274,50 @@
     // --- KONTAKTE ---
     
     // *** NEU: Diese Funktion fehlte vorher! ***
-    function openContactModal() {
-        // Einfache Eingabe über Prompts (könnte man später durch ein schönes Modal ersetzen)
-        const name = prompt("Name des Kontakts:");
-        if (!name) return;
-        
-        const rel = prompt("Beziehung (z.B. Oma, Onkel):", "Freund");
-        const phone = prompt("Telefonnummer:", "01");
-        const addr = prompt("Adresse (für Navi):", "");
-        const bday = prompt("Geburtstag (YYYY-MM-DD):", "");
+    // --- MODAL LOGIK ---
 
-        const newContact = {
-            id: Date.now(), // Einzigartige ID
-            name: name,
-            rel: rel,
-            phone: phone,
-            addr: addr,
-            bday: bday
-        };
+function openContactModal() {
+    // Eingabefelder leeren
+    document.getElementById('inpName').value = '';
+    document.getElementById('inpRel').value = '';
+    document.getElementById('inpPhone').value = '';
+    document.getElementById('inpAddr').value = '';
+    document.getElementById('inpBday').value = '';
 
-        let contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
-        contacts.push(newContact);
-        localStorage.setItem('familyContacts', JSON.stringify(contacts));
-        renderContacts();
-    }
+    // Modal anzeigen mit Animation
+    const modal = document.getElementById('contactModal');
+    modal.style.display = 'flex';
+    // Kleiner Timeout damit die CSS-Transition greift
+    setTimeout(() => modal.classList.add('active'), 10);
+}
+
+function closeContactModal() {
+    const modal = document.getElementById('contactModal');
+    modal.classList.remove('active');
+    setTimeout(() => modal.style.display = 'none', 300); // Warten bis Animation fertig
+}
+
+function saveContact() {
+    const name = document.getElementById('inpName').value;
+    if(!name) { alert("Bitte mindestens einen Namen eingeben!"); return; }
+
+    const newContact = {
+        id: Date.now(),
+        name: name,
+        rel: document.getElementById('inpRel').value,
+        phone: document.getElementById('inpPhone').value,
+        addr: document.getElementById('inpAddr').value,
+        bday: document.getElementById('inpBday').value
+    };
+
+    let contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
+    contacts.push(newContact);
+    localStorage.setItem('familyContacts', JSON.stringify(contacts));
+    
+    renderContacts();
+    closeContactModal();
+}
+
 
     function renderContacts() {
         const list = document.getElementById('contactsList');
