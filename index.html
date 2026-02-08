@@ -24,7 +24,7 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-color);
             margin: 0;
-            padding-bottom: 100px; /* Platz für TabBar */
+            padding-bottom: 100px;
             -webkit-user-select: none;
             user-select: none;
         }
@@ -36,6 +36,9 @@
 
         h1 { margin-top: 40px; font-size: 28px; color: #1c1c1e; text-align: center; font-weight: 700; }
         h3 { width: 100%; margin-top: 25px; color: #3a3a3c; border-bottom: 1px solid #d1d1d6; padding-bottom: 5px; font-size: 18px; font-weight: 600; }
+        
+        /* ABC Header */
+        .abc-header { width: 100%; padding: 10px 15px; font-weight: bold; color: #8e8e93; background: transparent; font-size: 14px; margin-top: 5px; }
 
         /* --- ROUTINE --- */
         .progress-container { width: 100%; height: 18px; background: #e5e5ea; border-radius: 10px; margin: 20px 0; overflow: hidden; }
@@ -66,11 +69,17 @@
         
         .call-btn { background: var(--success-green); color: white; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 18px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         
-        /* FAB (Plus Button) */
+        /* Action Buttons im Detailbereich */
+        .action-row { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-edit, .btn-del { flex: 1; padding: 10px; border-radius: 10px; font-size: 14px; text-align: center; border: none; font-weight: 500; cursor: pointer; }
+        .btn-edit { background: #eef5ff; color: var(--primary-blue); }
+        .btn-del { background: #fff0f0; color: var(--danger-red); }
+
+        /* FAB */
         .fab { position: fixed; bottom: 100px; right: 20px; background: var(--primary-blue); color: white; width: 56px; height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 12px rgba(0,122,255,0.4); border: none; cursor: pointer; z-index: 900; transition: transform 0.2s; }
         .fab:active { transform: scale(0.9); }
 
-        /* --- NEUES MODAL (KARTEN DESIGN) --- */
+        /* --- MODAL (KARTEN DESIGN) --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); z-index: 2000;
@@ -80,7 +89,7 @@
         .modal-overlay.active { opacity: 1; }
         
         .modal-sheet {
-            background: var(--bg-color); /* Gleiche Farbe wie App-Hintergrund */
+            background: var(--bg-color);
             width: 100%; height: 85%; max-width: 600px;
             border-radius: 20px 20px 0 0;
             transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -98,26 +107,19 @@
         .cancel-btn { color: #8e8e93; }
         .save-btn { color: var(--primary-blue); font-weight: 700; font-size: 17px !important; }
 
+        /* Favoriten Stern im Header */
+        #favToggle { font-size: 22px; color: #ccc; transition: 0.2s; cursor: pointer; margin-right: 15px; }
+        #favToggle.active { color: var(--fav-yellow); }
+
         .modal-body { padding: 25px 20px; overflow-y: auto; flex-grow: 1; }
 
-        /* Eingabefelder im Karten-Look */
         .input-card {
             background: white; border-radius: 18px; padding: 15px; margin-bottom: 12px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.04); display: flex; align-items: center;
         }
-        
-        /* Spezieller Style für die Namenskarte (wie in Übersicht) */
-        .name-card {
-            display: flex; flex-direction: column; align-items: flex-start;
-        }
-        .inp-big {
-            font-size: 18px; font-weight: bold; border: none; width: 100%; outline: none; margin-bottom: 5px;
-        }
-        .inp-small {
-            font-size: 14px; color: #8e8e93; border: none; width: 100%; outline: none;
-        }
-        
-        /* Icons in Eingabefeldern */
+        .name-card { display: flex; flex-direction: column; align-items: flex-start; }
+        .inp-big { font-size: 18px; font-weight: bold; border: none; width: 100%; outline: none; margin-bottom: 5px; }
+        .inp-small { font-size: 14px; color: #8e8e93; border: none; width: 100%; outline: none; }
         .inp-icon { width: 30px; text-align: center; font-size: 18px; margin-right: 15px; }
         .inp-std { border: none; font-size: 16px; width: 100%; outline: none; background: transparent; height: 100%; }
 
@@ -205,7 +207,12 @@
         <div class="modal-sheet">
             <div class="modal-header">
                 <button onclick="closeContactModal()" class="cancel-btn">Abbrechen</button>
-                <span style="font-weight: 600; color: #1c1c1e;">Neuer Kontakt</span>
+                
+                <div style="display:flex; align-items:center;">
+                    <i id="favToggle" class="fas fa-star" onclick="toggleFavState(this)"></i>
+                    <span style="font-weight: 600; color: #1c1c1e;">Kontakt</span>
+                </div>
+                
                 <button onclick="saveContact()" class="save-btn">Speichern</button>
             </div>
             
@@ -229,16 +236,13 @@
                     <i class="fas fa-birthday-cake inp-icon" style="color: #ff2d55;"></i>
                     <input type="date" id="inpBday" class="inp-std" style="color: #333;">
                 </div>
-
-                <p style="text-align: center; color: #999; font-size: 12px; margin-top: 20px;">
-                    Die Eingabe sieht jetzt genau so aus wie die Anzeige.
-                </p>
             </div>
         </div>
     </div>
 
     <script>
         const DELETE_PIN = "2410";
+        let currentEditId = null; // Speichert ID wenn wir bearbeiten, null wenn neu
 
         // --- NAV ---
         function showTab(id, el) {
@@ -293,15 +297,35 @@
 
         // --- KONTAKTE MODAL & LOGIK ---
         
-        function openContactModal() {
-            // Felder leeren
-            document.getElementById('inpName').value = '';
-            document.getElementById('inpRel').value = '';
-            document.getElementById('inpPhone').value = '';
-            document.getElementById('inpAddr').value = '';
-            document.getElementById('inpBday').value = '';
+        function toggleFavState(el) {
+            el.classList.toggle('active');
+        }
 
+        // Öffnet Modal - entweder leer (neu) oder gefüllt (bearbeiten)
+        function openContactModal(contact = null) {
             const modal = document.getElementById('contactModal');
+            const favIcon = document.getElementById('favToggle');
+            
+            if(contact) {
+                // Bearbeiten Modus
+                currentEditId = contact.id;
+                document.getElementById('inpName').value = contact.name;
+                document.getElementById('inpRel').value = contact.rel || '';
+                document.getElementById('inpPhone').value = contact.phone || '';
+                document.getElementById('inpAddr').value = contact.addr || '';
+                document.getElementById('inpBday').value = contact.bday || '';
+                if(contact.isFav) favIcon.classList.add('active'); else favIcon.classList.remove('active');
+            } else {
+                // Neu Modus
+                currentEditId = null;
+                document.getElementById('inpName').value = '';
+                document.getElementById('inpRel').value = '';
+                document.getElementById('inpPhone').value = '';
+                document.getElementById('inpAddr').value = '';
+                document.getElementById('inpBday').value = '';
+                favIcon.classList.remove('active');
+            }
+
             modal.style.display = 'flex';
             setTimeout(() => modal.classList.add('active'), 10);
         }
@@ -315,22 +339,40 @@
         function saveContact() {
             const name = document.getElementById('inpName').value.trim();
             if(!name) { alert("Bitte einen Namen eingeben!"); return; }
+            
+            const isFav = document.getElementById('favToggle').classList.contains('active');
 
-            const newContact = {
-                id: Date.now(),
+            const contactData = {
+                id: currentEditId ? currentEditId : Date.now(), // ID behalten oder neu generieren
                 name: name,
                 rel: document.getElementById('inpRel').value,
                 phone: document.getElementById('inpPhone').value,
                 addr: document.getElementById('inpAddr').value,
-                bday: document.getElementById('inpBday').value
+                bday: document.getElementById('inpBday').value,
+                isFav: isFav
             };
 
             let contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
-            contacts.push(newContact);
-            localStorage.setItem('familyContacts', JSON.stringify(contacts));
+
+            if(currentEditId) {
+                // UPDATE
+                const index = contacts.findIndex(c => c.id === currentEditId);
+                if(index > -1) contacts[index] = contactData;
+            } else {
+                // NEU
+                contacts.push(contactData);
+            }
             
+            localStorage.setItem('familyContacts', JSON.stringify(contacts));
             renderContacts();
             closeContactModal();
+        }
+
+        // Hilfsfunktion zum Bearbeiten aus der Liste heraus
+        function editContactFromList(id) {
+            const contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
+            const contact = contacts.find(c => c.id === id);
+            if(contact) openContactModal(contact);
         }
 
         function renderContacts() {
@@ -343,34 +385,64 @@
                 return;
             }
 
-            contacts.sort((a,b) => a.name.localeCompare(b.name)).forEach(c => {
-                const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.addr)}`;
-                
-                let bdayDisplay = 'Kein Datum';
-                if(c.bday) {
-                    const parts = c.bday.split('-');
-                    if(parts.length === 3) bdayDisplay = `${parts[2]}.${parts[1]}.${parts[0]}`;
-                }
+            // 1. Sortieren
+            contacts.sort((a,b) => a.name.localeCompare(b.name));
 
-                list.innerHTML += `
-                <div class="list-card">
-                    <div class="contact-main">
-                        <div onclick="toggleDetails(this)" style="flex-grow:1; cursor:pointer;">
-                            <strong style="font-size:17px;">${c.name}</strong><br>
-                            <span style="color:#8e8e93; font-size:14px;">${c.rel || 'Kontakt'}</span>
-                        </div>
-                        <div class="contact-actions">
-                            ${c.phone ? `<a href="tel:${c.phone}" class="call-btn"><i class="fas fa-phone"></i></a>` : ''}
-                        </div>
+            // 2. Aufteilen in Favoriten und Rest
+            const favs = contacts.filter(c => c.isFav);
+            const others = contacts.filter(c => !c.isFav);
+
+            // 3. Render Favoriten
+            if(favs.length > 0) {
+                list.innerHTML += '<h3 style="border:none; margin-top:10px;">Favoriten ⭐</h3>';
+                favs.forEach(c => list.innerHTML += createContactHTML(c));
+            }
+
+            // 4. Render ABC
+            if(others.length > 0) {
+                let lastLetter = '';
+                others.forEach(c => {
+                    const currentLetter = c.name.charAt(0).toUpperCase();
+                    // Wenn neuer Buchstabe, Header einfügen
+                    if(currentLetter !== lastLetter) {
+                        list.innerHTML += `<div class="abc-header">${currentLetter}</div>`;
+                        lastLetter = currentLetter;
+                    }
+                    list.innerHTML += createContactHTML(c);
+                });
+            }
+        }
+
+        // HTML Generator für einen Kontakt
+        function createContactHTML(c) {
+            const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.addr)}`;
+            let bdayDisplay = 'Kein Datum';
+            if(c.bday) {
+                const parts = c.bday.split('-');
+                if(parts.length === 3) bdayDisplay = `${parts[2]}.${parts[1]}.${parts[0]}`;
+            }
+
+            return `
+            <div class="list-card">
+                <div class="contact-main">
+                    <div onclick="toggleDetails(this)" style="flex-grow:1; cursor:pointer;">
+                        <strong style="font-size:17px;">${c.name}</strong><br>
+                        <span style="color:#8e8e93; font-size:14px;">${c.rel || 'Kontakt'}</span>
                     </div>
-                    <div class="contact-details">
-                        ${c.bday ? `<p><i class="fas fa-birthday-cake" style="color:#ff2d55; width:20px;"></i> ${bdayDisplay}</p>` : ''}
-                        ${c.addr ? `<p><i class="fas fa-map-marker-alt" style="color:#007aff; width:20px;"></i> <a href="${mapsUrl}" target="_blank" class="maps-link">${c.addr}</a></p>` : ''}
-                        
-                        <button onclick="deleteContactWithPin(${c.id})" style="margin-top:15px; width:100%; padding:10px; border:1px solid #ff3b30; color:#ff3b30; background:white; border-radius:10px; font-size:14px;">Kontakt löschen</button>
+                    <div class="contact-actions">
+                        ${c.phone ? `<a href="tel:${c.phone}" class="call-btn"><i class="fas fa-phone"></i></a>` : ''}
                     </div>
-                </div>`;
-            });
+                </div>
+                <div class="contact-details">
+                    ${c.bday ? `<p><i class="fas fa-birthday-cake" style="color:#ff2d55; width:20px;"></i> ${bdayDisplay}</p>` : ''}
+                    ${c.addr ? `<p><i class="fas fa-map-marker-alt" style="color:#007aff; width:20px;"></i> <a href="${mapsUrl}" target="_blank" class="maps-link">${c.addr}</a></p>` : ''}
+                    
+                    <div class="action-row">
+                        <button class="btn-edit" onclick="editContactFromList(${c.id})">Bearbeiten</button>
+                        <button class="btn-del" onclick="deleteContactWithPin(${c.id})">Löschen</button>
+                    </div>
+                </div>
+            </div>`;
         }
 
         function toggleDetails(el) {
@@ -389,7 +461,6 @@
         }
 
         // --- KALENDER LOGIK ---
-        
         function saveFilter() { 
             localStorage.setItem('trashFilter', document.getElementById('filterInput').value); 
             renderTrash();
