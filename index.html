@@ -13,6 +13,8 @@
         :root {
             --bg-color: #f0f2f5;
             --primary-blue: #007aff;
+            --marlene-color: #ff2d55; /* Pink für Marlene */
+            --linda-color: #af52de;   /* Lila für Linda */
             --success-green: #34c759;
             --danger-red: #ff3b30;
             --fav-yellow: #ffcc00;
@@ -23,7 +25,7 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-color);
             margin: 0;
-            padding-bottom: 110px; /* Mehr Platz für TabBar */
+            padding-bottom: 110px;
             -webkit-user-select: none;
             user-select: none;
         }
@@ -37,63 +39,55 @@
         h3 { width: 100%; margin-top: 25px; color: #3a3a3c; border-bottom: 1px solid #d1d1d6; padding-bottom: 5px; font-size: 18px; font-weight: 600; }
         .abc-header { width: 100%; padding: 10px 15px; font-weight: bold; color: #8e8e93; background: transparent; font-size: 14px; margin-top: 5px; }
 
-        /* --- ROUTINE & WOCHE --- */
+        /* --- ROUTINE CARDS --- */
         .progress-container { width: 100%; height: 18px; background: #e5e5ea; border-radius: 10px; margin: 20px 0; overflow: hidden; }
-        #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary-blue), #5856d6); transition: width 0.4s; }
+        /* Wir nutzen jetzt Klassen statt IDs für die Bars, damit wir sie pro Sektion steuern können */
+        .bar-fill { width: 0%; height: 100%; transition: width 0.4s; }
         
+        /* Marlene Style */
+        #routineMarlene .bar-fill { background: linear-gradient(90deg, var(--marlene-color), #ff5e3a); }
+        #routineMarlene .card.done { background: var(--marlene-color); }
+
+        /* Linda Style */
+        #routineLinda .bar-fill { background: linear-gradient(90deg, var(--linda-color), #5856d6); }
+        #routineLinda .card.done { background: var(--linda-color); }
+
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
         
         .card { background: white; border-radius: 20px; height: 120px; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 3px solid transparent; transition: 0.2s; -webkit-tap-highlight-color: transparent; cursor: pointer; }
-        .card.done { background: var(--success-green); color: white; transform: scale(0.95); }
+        .card.done { color: white; transform: scale(0.95); }
         .card .icon { font-size: 40px; margin-bottom: 8px; }
 
-        /* Wochen-Kacheln */
+        /* --- OTHER SECTIONS --- */
         .week-card { align-items: flex-start; padding: 15px; height: auto; min-height: 100px; justify-content: flex-start; }
         .week-card.today { border: 2px solid var(--primary-blue); background: #f0f8ff; }
         .day-header { font-weight: bold; color: #8e8e93; font-size: 14px; margin-bottom: 10px; width: 100%; border-bottom: 1px solid #eee; padding-bottom: 5px; }
         .event-badge { font-size: 12px; margin-bottom: 4px; padding: 4px 8px; border-radius: 6px; width: 100%; box-sizing: border-box; }
 
-        /* --- AUFGABEN LISTE (NEU) --- */
-        .task-item {
-            background: white; width: 100%; border-radius: 15px; margin-bottom: 10px; padding: 15px;
-            display: flex; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.03);
-            transition: 0.3s;
-        }
+        .task-item { background: white; width: 100%; border-radius: 15px; margin-bottom: 10px; padding: 15px; display: flex; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.03); transition: 0.3s; }
         .task-item.completed { opacity: 0.5; background: #f9f9f9; }
         .task-item.completed span { text-decoration: line-through; }
-        
-        .checkbox-wrapper {
-            width: 24px; height: 24px; border: 2px solid #ddd; border-radius: 50%; 
-            margin-right: 15px; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; flex-shrink: 0;
-        }
+        .checkbox-wrapper { width: 24px; height: 24px; border: 2px solid #ddd; border-radius: 50%; margin-right: 15px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
         .task-item.completed .checkbox-wrapper { background: var(--success-green); border-color: var(--success-green); color: white; }
-        
         .task-content { flex-grow: 1; }
         .task-title { font-size: 16px; font-weight: 600; color: #333; display: block; }
         .task-meta { font-size: 12px; color: #8e8e93; margin-top: 4px; display: flex; gap: 10px; }
         .task-assignee { background: #eef5ff; color: var(--primary-blue); padding: 2px 6px; border-radius: 4px; }
         .task-due.overdue { color: var(--danger-red); font-weight: bold; }
-
         .btn-del-mini { background: none; border: none; color: #ccc; padding: 10px; font-size: 14px; }
 
-        /* --- KALENDER & KONTAKTE STYLE --- */
         .trash-item { border-left: 6px solid #ccc; }
         .trash-Rest { border-color: #333; }
         .trash-Bio { border-color: #8B4513; }
         .trash-Papier { border-color: #007aff; }
         .trash-Gelb { border-color: #ffcc00; }
 
-        .list-card { 
-            background: white; width: 100%; padding: 15px; border-radius: 18px; margin-bottom: 10px; box-sizing: border-box; 
-            box-shadow: 0 2px 6px rgba(0,0,0,0.04); position: relative; display: flex; flex-direction: column; justify-content: center;
-        }
+        .list-card { background: white; width: 100%; padding: 15px; border-radius: 18px; margin-bottom: 10px; box-sizing: border-box; box-shadow: 0 2px 6px rgba(0,0,0,0.04); position: relative; display: flex; flex-direction: column; justify-content: center; }
         .contact-main { display: flex; justify-content: space-between; align-items: center; width: 100%; }
         .contact-details { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid #f2f2f7; font-size: 15px; color: #333; line-height: 1.8; }
         .contact-details.show { display: block; }
         .contact-details p { margin: 5px 0; display: flex; align-items: center; gap: 10px; }
         .maps-link { color: var(--primary-blue); text-decoration: none; font-weight: 500; }
-        
         .call-btn { background: var(--success-green); color: white; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 18px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .action-row { display: flex; gap: 10px; margin-top: 15px; }
         .btn-edit, .btn-del { flex: 1; padding: 10px; border-radius: 10px; font-size: 14px; text-align: center; border: none; font-weight: 500; cursor: pointer; }
@@ -104,18 +98,9 @@
         .fab:active { transform: scale(0.9); }
 
         /* --- MODAL --- */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); z-index: 2000;
-            display: none; align-items: flex-end; justify-content: center;
-            opacity: 0; transition: opacity 0.3s; backdrop-filter: blur(4px);
-        }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; display: none; align-items: flex-end; justify-content: center; opacity: 0; transition: opacity 0.3s; backdrop-filter: blur(4px); }
         .modal-overlay.active { opacity: 1; }
-        .modal-sheet {
-            background: var(--bg-color); width: 100%; height: 85%; max-width: 600px;
-            border-radius: 20px 20px 0 0; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-            display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
-        }
+        .modal-sheet { background: var(--bg-color); width: 100%; height: 85%; max-width: 600px; border-radius: 20px 20px 0 0; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); }
         .modal-overlay.active .modal-sheet { transform: translateY(0); }
         .modal-header { height: 60px; background: white; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-bottom: 0.5px solid #d1d1d6; flex-shrink: 0; }
         .modal-header button { background: none; border: none; font-size: 16px; cursor: pointer; padding: 10px; font-weight: 500; }
@@ -131,11 +116,11 @@
         .inp-small { font-size: 14px; color: #8e8e93; border: none; width: 100%; outline: none; }
         .inp-icon { width: 30px; text-align: center; font-size: 18px; margin-right: 15px; }
         .inp-std { border: none; font-size: 16px; width: 100%; outline: none; background: transparent; height: 100%; }
-        select.inp-std { -webkit-appearance: none; background: white; } /* Fix für Select */
+        select.inp-std { -webkit-appearance: none; background: white; }
 
-        /* --- NAV --- */
-        .tab-bar { position: fixed; bottom: 0; width: 100%; height: 85px; background: var(--tab-bar-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); display: flex; justify-content: space-around; align-items: center; border-top: 0.5px solid #d1d1d6; padding-bottom: env(safe-area-inset-bottom); z-index: 1000; }
-        .tab-item { display: flex; flex-direction: column; align-items: center; color: #8e8e93; font-size: 11px; text-decoration: none; width: 20%; cursor: pointer; }
+        /* --- NAV 6 ITEMS --- */
+        .tab-bar { position: fixed; bottom: 0; width: 100%; height: 85px; background: var(--tab-bar-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); display: flex; justify-content: space-between; align-items: center; border-top: 0.5px solid #d1d1d6; padding-bottom: env(safe-area-inset-bottom); z-index: 1000; padding-left:5px; padding-right:5px; }
+        .tab-item { display: flex; flex-direction: column; align-items: center; color: #8e8e93; font-size: 10px; text-decoration: none; flex: 1; cursor: pointer; text-align: center; }
         .tab-item.active { color: var(--primary-blue); }
         .tab-item i { font-size: 20px; margin-bottom: 4px; }
         
@@ -153,9 +138,9 @@
     <audio id="snd-5" src="https://assets.mixkit.co/active_storage/sfx/2100/2100-preview.mp3"></audio> 
     <audio id="finalSuccess" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
 
-    <section id="routine" class="active">
-        <h1>Routine 🌙</h1>
-        <div class="progress-container"><div id="progress-bar"></div></div>
+    <section id="routineMarlene" class="active">
+        <h1>Marlene 🌙</h1>
+        <div class="progress-container"><div class="bar-fill"></div></div>
         <div class="grid">
             <div class="card" onclick="toggleTask(this, 0)"><span class="icon">🍎</span><span class="label">Abendessen</span></div>
             <div class="card" onclick="toggleTask(this, 1)"><span class="icon">🧸</span><span class="label">Aufräumen</span></div>
@@ -164,7 +149,21 @@
             <div class="card" onclick="toggleTask(this, 4)"><span class="icon">🧺</span><span class="label">Wäschesack</span></div>    
             <div class="card" onclick="toggleTask(this, 5)"><span class="icon">🪮</span><span class="label">Haarekämmen</span></div>
         </div>
-        <button style="margin-top: 30px; background: none; border: none; color: #8e8e93; font-size: 14px;" onclick="resetRoutine(true)">Liste zurücksetzen</button>
+        <button style="margin-top: 30px; background: none; border: none; color: #8e8e93; font-size: 14px;" onclick="resetRoutine('routineMarlene')">Marlenes Liste zurücksetzen</button>
+    </section>
+
+    <section id="routineLinda">
+        <h1>Linda 🌙</h1>
+        <div class="progress-container"><div class="bar-fill"></div></div>
+        <div class="grid">
+            <div class="card" onclick="toggleTask(this, 0)"><span class="icon">🍎</span><span class="label">Abendessen</span></div>
+            <div class="card" onclick="toggleTask(this, 1)"><span class="icon">🧸</span><span class="label">Aufräumen</span></div>
+            <div class="card" onclick="toggleTask(this, 2)"><span class="icon">🪥</span><span class="label">Zähneputzen</span></div>
+            <div class="card" onclick="toggleTask(this, 3)"><span class="icon">👚</span><span class="label">Schlafanzug</span></div>
+            <div class="card" onclick="toggleTask(this, 4)"><span class="icon">🧺</span><span class="label">Wäschesack</span></div>    
+            <div class="card" onclick="toggleTask(this, 5)"><span class="icon">🪮</span><span class="label">Haarekämmen</span></div>
+        </div>
+        <button style="margin-top: 30px; background: none; border: none; color: #8e8e93; font-size: 14px;" onclick="resetRoutine('routineLinda')">Lindas Liste zurücksetzen</button>
     </section>
 
     <div id="videoOverlay" onclick="closeVideo()">
@@ -180,7 +179,7 @@
     </section>
 
     <section id="tasks">
-        <h1>Aufgaben & Notizen ✅</h1>
+        <h1>Aufgaben ✅</h1>
         <div id="taskList" style="width: 100%;"></div>
         <button class="fab" onclick="openTaskModal()"><i class="fas fa-plus"></i></button>
     </section>
@@ -189,7 +188,7 @@
         <h1>Kalender 📅</h1>
         <div id="trashDisplay" style="width: 100%;"></div>
         <div style="margin-top: 15px; background: white; padding: 15px; border-radius: 18px; width: 100%; box-sizing: border-box;">
-            <h4 style="margin: 0 0 5px 0; font-size: 14px; color: #3a3a3c;">Müll-Filter:</h4>
+            <h4 style="margin: 0 0 5px 0; font-size: 14px; color: #3a3a3c;">Filter:</h4>
             <input type="text" id="filterInput" placeholder="z.B. 4-wöchentlich" onchange="saveFilter()" style="width:100%; border:1px solid #ddd; border-radius:8px; padding: 8px;">
         </div>
         <div id="birthdayDisplay" style="width: 100%;"></div>
@@ -206,8 +205,11 @@
     </section>
 
     <nav class="tab-bar">
-        <div class="tab-item active" onclick="showTab('routine', this)">
-            <i class="fas fa-tasks"></i><span>Routine</span>
+        <div class="tab-item active" onclick="showTab('routineMarlene', this)">
+            <i class="fas fa-child"></i><span>Marlene</span>
+        </div>
+        <div class="tab-item" onclick="showTab('routineLinda', this)">
+            <i class="fas fa-child-dress"></i><span>Linda</span>
         </div>
         <div class="tab-item" onclick="showTab('weekly', this)">
             <i class="fas fa-calendar-week"></i><span>Woche</span>
@@ -298,20 +300,27 @@
             setTimeout(() => modal.style.display = 'none', 300);
         }
 
-        // --- ROUTINE ---
+        // --- ROUTINE (MULTI USER) ---
         function toggleTask(el, i) {
             const isDone = el.classList.toggle('done');
             if(isDone) {
                 const snd = document.getElementById('snd-' + i);
                 if(snd) { snd.currentTime = 0; snd.play().catch(()=>{}); }
             }
-            updateProgress();
+            // Finde heraus, in welcher Sektion wir sind (Marlene oder Linda)
+            const parentSectionId = el.closest('section').id;
+            updateProgress(parentSectionId);
         }
 
-        function updateProgress() {
-            const cards = document.querySelectorAll('#routine .card');
-            const done = document.querySelectorAll('#routine .card.done').length;
-            document.getElementById('progress-bar').style.width = (done/cards.length*100) + '%';
+        function updateProgress(sectionId) {
+            const container = document.getElementById(sectionId);
+            const cards = container.querySelectorAll('.card');
+            const done = container.querySelectorAll('.card.done').length;
+            
+            // Finde den Balken innerhalb dieser Sektion
+            const bar = container.querySelector('.bar-fill');
+            bar.style.width = (done/cards.length*100) + '%';
+            
             if(done === cards.length && done > 0) {
                 document.getElementById('videoOverlay').style.display = 'flex';
                 document.getElementById('confetti').style.display = 'block';
@@ -320,39 +329,37 @@
                 setTimeout(closeVideo, 8000);
             }
         }
+
         function closeVideo() {
             document.getElementById('videoOverlay').style.display = 'none';
             document.getElementById('confetti').style.display = 'none';
             document.getElementById('rewardVideo').pause();
         }
-        function resetRoutine(ask) {
-            if(ask && !confirm("Routine zurücksetzen?")) return;
-            document.querySelectorAll('#routine .card').forEach(c => c.classList.remove('done'));
-            document.getElementById('progress-bar').style.width = '0%';
+
+        function resetRoutine(sectionId) {
+            if(!confirm("Routine für " + (sectionId.includes('Marlene') ? 'Marlene' : 'Linda') + " zurücksetzen?")) return;
+            const container = document.getElementById(sectionId);
+            container.querySelectorAll('.card').forEach(c => c.classList.remove('done'));
+            container.querySelector('.bar-fill').style.width = '0%';
         }
 
-        // --- WOCHENANSICHT (ROLLING) ---
+        // --- WOCHENANSICHT ---
         function renderWeekly() {
             const container = document.getElementById('weekGrid');
             container.innerHTML = '';
             const trashData = JSON.parse(localStorage.getItem('trashData')) || [];
             const contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
             const tasks = JSON.parse(localStorage.getItem('familyTasks')) || [];
-
-            // START: Heute. Wir zeigen HEUTE + 6 Tage (insg. 7 Tage)
             const today = new Date();
 
             for (let i = 0; i < 7; i++) {
                 let currentDay = new Date(today);
                 currentDay.setDate(today.getDate() + i);
-
                 const dateIso = currentDay.toISOString().split('T')[0];
                 const dateTrash = dateIso.replace(/-/g, '');
                 const dateBday = dateIso.slice(5);
 
                 let eventsHtml = '';
-
-                // Müll
                 trashData.filter(t => t.d === dateTrash).forEach(t => {
                     let color = '#333', bg = '#eee';
                     const s = t.s.toLowerCase();
@@ -361,45 +368,35 @@
                     else if(s.includes('papier')||s.includes('blau')) { color='#fff'; bg='#007aff'; }
                     eventsHtml += `<div class="event-badge" style="background:${bg}; color:${color}">🗑️ ${t.s}</div>`;
                 });
-
-                // Geburtstage
                 contacts.filter(c => c.bday && c.bday.slice(5) === dateBday).forEach(c => {
                     eventsHtml += `<div class="event-badge" style="background:#ffecf0; color:#ff2d55;">🎂 ${c.name}</div>`;
                 });
-
-                // Aufgaben (Fällig an diesem Tag)
                 tasks.filter(t => !t.done && t.due === dateIso).forEach(t => {
                      eventsHtml += `<div class="event-badge" style="background:#eef5ff; color:#007aff;">✅ ${t.title}</div>`;
                 });
-
                 if(eventsHtml === '') eventsHtml = '<span style="font-size:12px; color:#ccc;">Leer</span>';
-
                 const weekDayName = currentDay.toLocaleDateString('de-DE', { weekday: 'short' });
                 const dayNum = currentDay.getDate();
-                const isToday = i === 0;
-
+                
                 container.innerHTML += `
-                <div class="card week-card ${isToday ? 'today' : ''}">
+                <div class="card week-card ${i===0 ? 'today' : ''}">
                     <div class="day-header">${weekDayName} ${dayNum}.</div>
                     ${eventsHtml}
                 </div>`;
             }
         }
 
-        // --- AUFGABEN LOGIK (NEU) ---
+        // --- AUFGABEN ---
         function openTaskModal() {
-            // Dropdown füllen
             const select = document.getElementById('taskAssignee');
             const contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
             select.innerHTML = '<option value="">Für wen?</option>';
             contacts.forEach(c => {
                 select.innerHTML += `<option value="${c.name}">${c.name}</option>`;
             });
-
             document.getElementById('taskTitle').value = '';
             document.getElementById('taskAssignee').value = '';
             document.getElementById('taskDue').value = '';
-            
             const modal = document.getElementById('taskModal');
             modal.style.display = 'flex';
             setTimeout(() => modal.classList.add('active'), 10);
@@ -408,16 +405,13 @@
         function saveTask() {
             const title = document.getElementById('taskTitle').value.trim();
             if(!title) { alert("Bitte Aufgabe eingeben"); return; }
-            
             const newTask = {
                 id: Date.now(),
                 title: title,
                 assignee: document.getElementById('taskAssignee').value,
-                due: document.getElementById('taskDue').value, // YYYY-MM-DD
-                created: new Date().toISOString().split('T')[0],
+                due: document.getElementById('taskDue').value,
                 done: false
             };
-
             let tasks = JSON.parse(localStorage.getItem('familyTasks')) || [];
             tasks.push(newTask);
             localStorage.setItem('familyTasks', JSON.stringify(tasks));
@@ -430,7 +424,6 @@
             const idx = tasks.findIndex(t => t.id === id);
             if(idx > -1) {
                 tasks[idx].done = !tasks[idx].done;
-                // Sound wenn erledigt
                 if(tasks[idx].done) {
                     const s = document.getElementById('snd-2');
                     if(s) { s.currentTime=0; s.play().catch(()=>{}); }
@@ -441,7 +434,7 @@
         }
 
         function deleteTask(id) {
-            if(!confirm("Aufgabe löschen?")) return;
+            if(!confirm("Löschen?")) return;
             let tasks = JSON.parse(localStorage.getItem('familyTasks')) || [];
             localStorage.setItem('familyTasks', JSON.stringify(tasks.filter(t => t.id !== id)));
             renderTasks();
@@ -451,24 +444,17 @@
             const list = document.getElementById('taskList');
             let tasks = JSON.parse(localStorage.getItem('familyTasks')) || [];
             list.innerHTML = '';
-
-            // Sortierung: Erst offene, dann erledigte. Offene nach Datum.
             tasks.sort((a,b) => {
                 if(a.done === b.done) return (a.due || '9999') > (b.due || '9999') ? 1 : -1;
                 return a.done ? 1 : -1;
             });
-
             if(tasks.length === 0) { list.innerHTML = '<p style="text-align:center; color:#999; margin-top:40px;">Alles erledigt! 😎</p>'; return; }
-
             tasks.forEach(t => {
                 const isOverdue = !t.done && t.due && t.due < new Date().toISOString().split('T')[0];
                 const dueDisplay = t.due ? new Date(t.due).toLocaleDateString('de-DE') : '';
-                
                 list.innerHTML += `
                 <div class="task-item ${t.done ? 'completed' : ''}">
-                    <div class="checkbox-wrapper" onclick="toggleTaskState(${t.id})">
-                        ${t.done ? '<i class="fas fa-check"></i>' : ''}
-                    </div>
+                    <div class="checkbox-wrapper" onclick="toggleTaskState(${t.id})">${t.done ? '<i class="fas fa-check"></i>' : ''}</div>
                     <div class="task-content">
                         <span class="task-title">${t.title}</span>
                         <div class="task-meta">
@@ -483,7 +469,6 @@
 
         // --- KONTAKTE ---
         function toggleFavState(el) { el.classList.toggle('active'); }
-
         function openContactModal(contact = null) {
             const modal = document.getElementById('contactModal');
             const favIcon = document.getElementById('favToggle');
@@ -510,7 +495,7 @@
 
         function saveContact() {
             const name = document.getElementById('inpName').value.trim();
-            if(!name) { alert("Bitte Namen eingeben"); return; }
+            if(!name) { alert("Name fehlt"); return; }
             const isFav = document.getElementById('favToggle').classList.contains('active');
             const contactData = {
                 id: currentEditContactId ? currentEditContactId : Date.now(),
@@ -526,7 +511,6 @@
                 const index = contacts.findIndex(c => c.id === currentEditContactId);
                 if(index > -1) contacts[index] = contactData;
             } else contacts.push(contactData);
-            
             localStorage.setItem('familyContacts', JSON.stringify(contacts));
             renderContacts();
             closeModal('contactModal');
@@ -590,7 +574,7 @@
 
         // --- KALENDER HELPER ---
         function saveFilter() { localStorage.setItem('trashFilter', document.getElementById('filterInput').value); renderTrash(); }
-        function importIcs(e) { /* (ICS Logik identisch zum vorherigen Code, gekürzt für Übersicht) */ 
+        function importIcs(e) { 
             const file = e.target.files[0]; if(!file) return;
             const filterStr = document.getElementById('filterInput').value || "";
             const filterList = filterStr.toLowerCase().split(',').map(s=>s.trim()).filter(s=>s!=="");
@@ -633,7 +617,9 @@
         window.onload = function() { 
             const savedFilter = localStorage.getItem('trashFilter');
             if(savedFilter) document.getElementById('filterInput').value = savedFilter;
-            if(document.querySelector('#contacts.active')) renderContacts();
+            
+            if(document.querySelector('#routineMarlene.active')) return; 
+            else if(document.querySelector('#contacts.active')) renderContacts();
             else if(document.querySelector('#weekly.active')) renderWeekly();
             else if(document.querySelector('#tasks.active')) renderTasks();
             else if(document.querySelector('#calendar.active')) { renderTrash(); renderBirthdays(); }
