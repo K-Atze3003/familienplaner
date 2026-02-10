@@ -14,8 +14,8 @@
         :root {
             --bg-color: #f0f2f5;
             --primary-blue: #007aff;
-            --marlene-color: #ff2d55; /* Pink für Marlene */
-            --linda-color: #af52de;   /* Lila für Linda */
+            --marlene-color: #ff2d55;
+            --linda-color: #af52de;
             --success-green: #34c759;
             --danger-red: #ff3b30;
             --fav-yellow: #ffcc00;
@@ -40,38 +40,51 @@
         h3 { width: 100%; margin-top: 25px; color: #3a3a3c; border-bottom: 1px solid #d1d1d6; padding-bottom: 5px; font-size: 18px; font-weight: 600; }
         .abc-header { width: 100%; padding: 10px 15px; font-weight: bold; color: #8e8e93; background: transparent; font-size: 14px; margin-top: 5px; }
 
-        /* --- ROUTINE CARDS & ANIMATION --- */
+        /* --- ROUTINE --- */
         .progress-container { width: 100%; height: 18px; background: #e5e5ea; border-radius: 10px; margin: 20px 0; overflow: hidden; position: relative; }
-        .bar-fill { width: 0%; height: 100%; transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); } /* Bouncy transition */
-        
-        /* Animation Klasse für den Balken */
+        .bar-fill { width: 0%; height: 100%; transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .bar-bounce { animation: bounceBar 0.5s ease; }
-        @keyframes bounceBar {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
+        @keyframes bounceBar { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
-        /* Marlene Style */
         #routineMarlene .bar-fill { background: linear-gradient(90deg, var(--marlene-color), #ff5e3a); }
         #routineMarlene .card.done { background: var(--marlene-color); }
-
-        /* Linda Style */
         #routineLinda .bar-fill { background: linear-gradient(90deg, var(--linda-color), #5856d6); }
         #routineLinda .card.done { background: var(--linda-color); }
 
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; }
-        
         .card { background: white; border-radius: 20px; height: 120px; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 3px solid transparent; transition: 0.2s; -webkit-tap-highlight-color: transparent; cursor: pointer; }
         .card.done { color: white; transform: scale(0.95); }
         .card .icon { font-size: 40px; margin-bottom: 8px; }
 
-        /* --- OTHER SECTIONS --- */
-        .week-card { align-items: flex-start; padding: 15px; height: auto; min-height: 100px; justify-content: flex-start; }
+        /* --- WOCHE SLIDER (NEU) --- */
+        .scrolling-wrapper {
+            display: flex;
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+            width: 100%;
+            padding-bottom: 10px;
+            gap: 15px;
+            scroll-snap-type: x mandatory; /* Einrasten */
+        }
+        /* Scrollbalken verstecken */
+        .scrolling-wrapper::-webkit-scrollbar { display: none; }
+        
+        .week-card {
+            flex: 0 0 auto; /* Verhindert Schrumpfen */
+            width: 140px;   /* Feste Breite für Slide */
+            height: 160px;  /* Etwas höher */
+            scroll-snap-align: start;
+            align-items: flex-start; padding: 15px; 
+            justify-content: flex-start;
+            white-space: normal; /* Damit Text umbricht */
+        }
         .week-card.today { border: 2px solid var(--primary-blue); background: #f0f8ff; }
         .day-header { font-weight: bold; color: #8e8e93; font-size: 14px; margin-bottom: 10px; width: 100%; border-bottom: 1px solid #eee; padding-bottom: 5px; }
-        .event-badge { font-size: 12px; margin-bottom: 4px; padding: 4px 8px; border-radius: 6px; width: 100%; box-sizing: border-box; }
+        .event-badge { font-size: 11px; margin-bottom: 4px; padding: 4px 8px; border-radius: 6px; width: 100%; box-sizing: border-box; }
 
+        /* --- STYLES --- */
         .task-item { background: white; width: 100%; border-radius: 15px; margin-bottom: 10px; padding: 15px; display: flex; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.03); transition: 0.3s; }
         .task-item.completed { opacity: 0.5; background: #f9f9f9; }
         .task-item.completed span { text-decoration: line-through; }
@@ -105,6 +118,9 @@
         .fab { position: fixed; bottom: 100px; right: 20px; background: var(--primary-blue); color: white; width: 56px; height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 12px rgba(0,122,255,0.4); border: none; cursor: pointer; z-index: 900; transition: transform 0.2s; }
         .fab:active { transform: scale(0.9); }
 
+        /* Countdown Text */
+        .countdown-text { color: var(--primary-blue); font-weight: bold; font-size: 14px; text-align: right; }
+
         /* --- MODAL --- */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; display: none; align-items: flex-end; justify-content: center; opacity: 0; transition: opacity 0.3s; backdrop-filter: blur(4px); }
         .modal-overlay.active { opacity: 1; }
@@ -126,11 +142,11 @@
         .inp-std { border: none; font-size: 16px; width: 100%; outline: none; background: transparent; height: 100%; }
         select.inp-std { -webkit-appearance: none; background: white; }
 
-        /* --- NAV 6 ITEMS --- */
-        .tab-bar { position: fixed; bottom: 0; width: 100%; height: 85px; background: var(--tab-bar-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); display: flex; justify-content: space-between; align-items: center; border-top: 0.5px solid #d1d1d6; padding-bottom: env(safe-area-inset-bottom); z-index: 1000; padding-left:5px; padding-right:5px; }
-        .tab-item { display: flex; flex-direction: column; align-items: center; color: #8e8e93; font-size: 10px; text-decoration: none; flex: 1; cursor: pointer; text-align: center; }
+        /* --- NAV 7 ITEMS (Eng aber passt) --- */
+        .tab-bar { position: fixed; bottom: 0; width: 100%; height: 85px; background: var(--tab-bar-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); display: flex; justify-content: space-between; align-items: center; border-top: 0.5px solid #d1d1d6; padding-bottom: env(safe-area-inset-bottom); z-index: 1000; padding-left:2px; padding-right:2px; }
+        .tab-item { display: flex; flex-direction: column; align-items: center; color: #8e8e93; font-size: 9px; text-decoration: none; flex: 1; cursor: pointer; text-align: center; }
         .tab-item.active { color: var(--primary-blue); }
-        .tab-item i { font-size: 20px; margin-bottom: 4px; }
+        .tab-item i { font-size: 18px; margin-bottom: 4px; }
         
         #videoOverlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:5000; justify-content:center; align-items:center; flex-direction:column; color: white; }
     </style>
@@ -181,8 +197,9 @@
     </div>
 
     <section id="weekly">
-        <h1>Diese Woche 🗓️</h1>
-        <div id="weekGrid" class="grid"></div>
+        <h1>2-Wochen Ansicht 🗓️</h1>
+        <div id="weekGrid" class="scrolling-wrapper"></div>
+        <p style="text-align:center; color:#ccc; font-size:12px; margin-top:10px;">Wische zur Seite für mehr Tage</p>
     </section>
 
     <section id="tasks">
@@ -192,23 +209,39 @@
     </section>
 
     <section id="calendar">
-        <h1>Kalender 📅</h1>
+        <h1>Planer 📅</h1>
         <div id="trashDisplay" style="width: 100%;"></div>
-        <div style="margin-top: 15px; background: white; padding: 15px; border-radius: 18px; width: 100%; box-sizing: border-box;">
-            <h4 style="margin: 0 0 5px 0; font-size: 14px; color: #3a3a3c;">Filter:</h4>
-            <input type="text" id="filterInput" placeholder="z.B. 4-wöchentlich" onchange="saveFilter()" style="width:100%; border:1px solid #ddd; border-radius:8px; padding: 8px;">
-        </div>
         <div id="birthdayDisplay" style="width: 100%;"></div>
-        <div style="margin-top: 20px; text-align: center;">
-            <input type="file" id="icsInput" style="display:none" accept=".ics" onchange="importIcs(event)">
-            <label for="icsInput" style="color: var(--primary-blue); cursor: pointer;"><i class="fas fa-file-import"></i> Kalender einlesen</label>
-        </div>
     </section>
-
+    
     <section id="contacts">
         <h1>Kontakte 📞</h1>
         <div id="contactsList" style="width: 100%;"></div>
         <button class="fab" onclick="openContactModal()"><i class="fas fa-plus"></i></button>
+    </section>
+
+    <section id="settings">
+        <h1>Einstellungen ⚙️</h1>
+        
+        <div class="list-card">
+            <strong>Müll-Filter</strong>
+            <p style="font-size:13px; color:#8e8e93;">Gib Begriffe ein, die NICHT angezeigt werden sollen (z.B. 4-wöchentlich).</p>
+            <input type="text" id="filterInput" placeholder="Filterbegriffe..." onchange="saveFilter()" style="width:100%; border:1px solid #ddd; border-radius:8px; padding: 10px; margin-top:5px; box-sizing:border-box;">
+        </div>
+
+        <div class="list-card">
+            <strong>Müllkalender Import</strong>
+            <p style="font-size:13px; color:#8e8e93;">Lade eine .ics Datei deines Entsorgers hoch.</p>
+            <input type="file" id="icsInput" style="display:none" accept=".ics" onchange="importIcs(event)">
+            <label for="icsInput" style="display:block; margin-top:10px; color: var(--primary-blue); cursor: pointer; text-align:center; padding:10px; border:1px dashed var(--primary-blue); border-radius:8px;">
+                <i class="fas fa-file-import"></i> Datei auswählen
+            </label>
+        </div>
+
+        <div class="list-card" onclick="if(confirm('Alle Daten löschen?')) { localStorage.clear(); location.reload(); }">
+            <strong style="color:var(--danger-red);">App zurücksetzen</strong>
+            <p style="font-size:13px; color:#8e8e93;">Löscht alle Kontakte und Aufgaben.</p>
+        </div>
     </section>
 
     <nav class="tab-bar">
@@ -216,18 +249,22 @@
             <i class="fas fa-child"></i><span>Marlene</span>
         </div>
         <div class="tab-item" onclick="showTab('routineLinda', this)">
-            <i class="fas fa-female"></i><span>Linda</span> </div>
+            <i class="fas fa-female"></i><span>Linda</span>
+        </div>
         <div class="tab-item" onclick="showTab('weekly', this)">
             <i class="fas fa-calendar-week"></i><span>Woche</span>
         </div>
         <div class="tab-item" onclick="showTab('tasks', this)">
-            <i class="fas fa-check-circle"></i><span>Aufgaben</span>
+            <i class="fas fa-check-circle"></i><span>Aufg.</span>
         </div>
         <div class="tab-item" onclick="showTab('calendar', this)">
             <i class="fas fa-calendar-alt"></i><span>Planer</span>
         </div>
         <div class="tab-item" onclick="showTab('contacts', this)">
-            <i class="fas fa-address-book"></i><span>Kontakte</span>
+            <i class="fas fa-address-book"></i><span>Kontakt</span>
+        </div>
+        <div class="tab-item" onclick="showTab('settings', this)">
+            <i class="fas fa-cog"></i><span>Einst.</span>
         </div>
     </nav>
 
@@ -311,7 +348,6 @@
                 const snd = document.getElementById('snd-' + i);
                 if(snd) { snd.currentTime = 0; snd.play().catch(()=>{}); }
             }
-            // Finde heraus, in welcher Sektion wir sind (Marlene oder Linda)
             const parentSectionId = el.closest('section').id;
             updateProgress(parentSectionId);
         }
@@ -320,21 +356,18 @@
             const container = document.getElementById(sectionId);
             const cards = container.querySelectorAll('.card');
             const done = container.querySelectorAll('.card.done').length;
-            
-            // Finde den Balken innerhalb dieser Sektion
             const bar = container.querySelector('.bar-fill');
             bar.style.width = (done/cards.length*100) + '%';
             
-            // HÜPF-ANIMATION
             if(done > 0) {
                 const containerBar = container.querySelector('.progress-container');
-                containerBar.classList.remove('bar-bounce'); // Reset
-                void containerBar.offsetWidth; // Trigger Reflow
+                containerBar.classList.remove('bar-bounce');
+                void containerBar.offsetWidth;
                 containerBar.classList.add('bar-bounce');
             }
             
             if(done === cards.length && done > 0) {
-                triggerConfetti(); // Echtes Konfetti!
+                triggerConfetti();
                 document.getElementById('videoOverlay').style.display = 'flex';
                 document.getElementById('rewardVideo').play();
                 document.getElementById('finalSuccess').play().catch(()=>{});
@@ -346,14 +379,11 @@
             var duration = 3 * 1000;
             var animationEnd = Date.now() + duration;
             var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 6000 };
-
             function randomInOut(min, max) { return Math.random() * (max - min) + min; }
-
             var interval = setInterval(function() {
                 var timeLeft = animationEnd - Date.now();
                 if (timeLeft <= 0) { return clearInterval(interval); }
                 var particleCount = 50 * (timeLeft / duration);
-                // Konfetti von beiden Seiten feuern
                 confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.1, 0.3), y: Math.random() - 0.2 } }));
                 confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.7, 0.9), y: Math.random() - 0.2 } }));
             }, 250);
@@ -371,7 +401,7 @@
             container.querySelector('.bar-fill').style.width = '0%';
         }
 
-        // --- WOCHENANSICHT ---
+        // --- WOCHENANSICHT (SLIDEABLE) ---
         function renderWeekly() {
             const container = document.getElementById('weekGrid');
             container.innerHTML = '';
@@ -380,7 +410,8 @@
             const tasks = JSON.parse(localStorage.getItem('familyTasks')) || [];
             const today = new Date();
 
-            for (let i = 0; i < 7; i++) {
+            // Erzeuge 14 Tage (2 Wochen) für den Slider
+            for (let i = 0; i < 14; i++) {
                 let currentDay = new Date(today);
                 currentDay.setDate(today.getDate() + i);
                 const dateIso = currentDay.toISOString().split('T')[0];
@@ -403,13 +434,15 @@
                      eventsHtml += `<div class="event-badge" style="background:#eef5ff; color:#007aff;">✅ ${t.title}</div>`;
                 });
                 if(eventsHtml === '') eventsHtml = '<span style="font-size:12px; color:#ccc;">Leer</span>';
+                
                 const weekDayName = currentDay.toLocaleDateString('de-DE', { weekday: 'short' });
                 const dayNum = currentDay.getDate();
+                const monthNum = currentDay.getMonth() + 1;
                 
                 container.innerHTML += `
                 <div class="card week-card ${i===0 ? 'today' : ''}">
-                    <div class="day-header">${weekDayName} ${dayNum}.</div>
-                    ${eventsHtml}
+                    <div class="day-header">${weekDayName}, ${dayNum}.${monthNum}.</div>
+                    <div style="width:100%; overflow-y:auto;">${eventsHtml}</div>
                 </div>`;
             }
         }
@@ -600,8 +633,9 @@
             }
         }
 
-        // --- KALENDER HELPER ---
-        function saveFilter() { localStorage.setItem('trashFilter', document.getElementById('filterInput').value); renderTrash(); }
+        // --- KALENDER HELPER (Settings moved) ---
+        function saveFilter() { localStorage.setItem('trashFilter', document.getElementById('filterInput').value); }
+        
         function importIcs(e) { 
             const file = e.target.files[0]; if(!file) return;
             const filterStr = document.getElementById('filterInput').value || "";
@@ -619,10 +653,11 @@
                         if((/müll|abfuhr|tonne|papier|gelb|bio/.test(sLow)) && !filterList.some(b => sLow.includes(b))) events.push(cur);
                     }
                 });
-                if(events.length>0) { localStorage.setItem('trashData', JSON.stringify(events.sort((a,b)=>a.d.localeCompare(b.d)))); renderTrash(); alert("Importiert!"); }
+                if(events.length>0) { localStorage.setItem('trashData', JSON.stringify(events.sort((a,b)=>a.d.localeCompare(b.d)))); alert("Importiert!"); }
             };
             reader.readAsText(file);
         }
+
         function renderTrash() {
             const div = document.getElementById('trashDisplay');
             const data = JSON.parse(localStorage.getItem('trashData')) || [];
@@ -633,12 +668,48 @@
                 div.innerHTML += `<div class="list-card trash-item ${cls}"><strong>${x.s}</strong><br><small>${x.d.slice(6,8)}.${x.d.slice(4,6)}.</small></div>`;
             });
         }
+
+        // --- COUNTDOWN LOGIK (NEU) ---
+        function getDaysUntil(dateString) {
+            // dateString format YYYY-MM-DD
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            
+            const [y, m, d] = dateString.split('-').map(Number);
+            let bday = new Date(today.getFullYear(), m - 1, d);
+            
+            if (bday < today) {
+                bday.setFullYear(today.getFullYear() + 1);
+            }
+            
+            const diffTime = bday - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+            return diffDays;
+        }
+
         function renderBirthdays() {
             const div = document.getElementById('birthdayDisplay');
             const contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
             div.innerHTML = '<h3>Geburtstage 🎂</h3>';
-            contacts.filter(c => c.bday).slice(0, 5).forEach(b => {
-                 div.innerHTML += `<div class="list-card" style="flex-direction:row; justify-content:space-between;"><strong>${b.name}</strong><span>${b.bday.slice(8)}.${b.bday.slice(5,7)}.</span></div>`;
+            
+            // Filter und Sortieren nach "Tagen bis"
+            let upcoming = contacts.filter(c => c.bday).map(c => {
+                return { ...c, daysUntil: getDaysUntil(c.bday) };
+            }).sort((a,b) => a.daysUntil - b.daysUntil);
+
+            upcoming.slice(0, 5).forEach(b => {
+                let text = `in ${b.daysUntil} Tagen`;
+                if(b.daysUntil === 0) text = "Heute! 🎉";
+                else if(b.daysUntil === 1) text = "Morgen";
+
+                 div.innerHTML += `
+                 <div class="list-card" style="flex-direction:row; justify-content:space-between; align-items:center;">
+                    <div>
+                        <strong>${b.name}</strong>
+                        <div style="font-size:12px; color:#999;">${b.bday.slice(8)}.${b.bday.slice(5,7)}.</div>
+                    </div>
+                    <span class="countdown-text">${text}</span>
+                 </div>`;
             });
         }
 
