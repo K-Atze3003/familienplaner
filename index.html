@@ -14,8 +14,10 @@
         :root {
             --bg-color: #f0f2f5;
             --primary-blue: #007aff;
-            --marlene-color: #ff2d55;
+            /* BEIDE JETZT LILA */
+            --marlene-color: #af52de; 
             --linda-color: #af52de;
+            
             --success-green: #34c759;
             --danger-red: #ff3b30;
             --fav-yellow: #ffcc00;
@@ -46,8 +48,11 @@
         .bar-bounce { animation: bounceBar 0.5s ease; }
         @keyframes bounceBar { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
-        #routineMarlene .bar-fill { background: linear-gradient(90deg, var(--marlene-color), #ff5e3a); }
+        /* Marlene Style (Jetzt Lila Verlauf) */
+        #routineMarlene .bar-fill { background: linear-gradient(90deg, var(--marlene-color), #5856d6); }
         #routineMarlene .card.done { background: var(--marlene-color); }
+        
+        /* Linda Style */
         #routineLinda .bar-fill { background: linear-gradient(90deg, var(--linda-color), #5856d6); }
         #routineLinda .card.done { background: var(--linda-color); }
 
@@ -56,9 +61,9 @@
         .card.done { color: white; transform: scale(0.95); }
         .card .icon { font-size: 40px; margin-bottom: 8px; }
 
-        /* NEU: Klasse für das eigene Bild (Axolotl) */
+        /* BILDER KLASSE */
         .icon-img { 
-            height: 50px; 
+            height: 55px; /* Etwas größer für bessere Sichtbarkeit */
             width: auto; 
             margin-bottom: 8px; 
             pointer-events: none; 
@@ -172,17 +177,35 @@
         <h1>Marlene 🌙</h1>
         <div class="progress-container"><div class="bar-fill"></div></div>
         <div class="grid">
-            <div class="card" onclick="toggleTask(this, 0)"><span class="icon">🍎</span><span class="label">Abendessen</span></div>
+            <div class="card" onclick="toggleTask(this, 0)">
+                <img src="Essen.png" class="icon-img" alt="Essen">
+                <span class="label">Abendessen</span>
+            </div>
             
             <div class="card" onclick="toggleTask(this, 1)">
-                <img src="IMG_4085.png" class="icon-img" alt="Axolotl">
+                <img src="Marlene_Axolotl.png" class="icon-img" alt="Axolotl"
                 <span class="label">Aufräumen</span>
             </div>
 
-            <div class="card" onclick="toggleTask(this, 2)"><span class="icon">🪥</span><span class="label">Zähneputzen</span></div>
-            <div class="card" onclick="toggleTask(this, 3)"><span class="icon">👚</span><span class="label">Schlafanzug</span></div>
-            <div class="card" onclick="toggleTask(this, 4)"><span class="icon">🧺</span><span class="label">Wäschesack</span></div>    
-            <div class="card" onclick="toggleTask(this, 5)"><span class="icon">🪮</span><span class="label">Haarekämmen</span></div>
+            <div class="card" onclick="toggleTask(this, 2)">
+                <img src="zaehneputzen.png" class="icon-img" alt="Zähne">
+                <span class="label">Zähneputzen</span>
+            </div>
+
+            <div class="card" onclick="toggleTask(this, 3)">
+                <img src="schlafanzug.png" class="icon-img" alt="Schlafanzug">
+                <span class="label">Schlafanzug</span>
+            </div>
+
+            <div class="card" onclick="toggleTask(this, 4)">
+                <span class="icon">🧺</span>
+                <span class="label">Wäschesack</span>
+            </div>    
+
+            <div class="card" onclick="toggleTask(this, 5)">
+                <img src="kaemmen.png" class="icon-img" alt="Haare">
+                <span class="label">Haarekämmen</span>
+            </div>
         </div>
         <button style="margin-top: 30px; background: none; border: none; color: #8e8e93; font-size: 14px;" onclick="resetRoutine('routineMarlene')">Marlenes Liste zurücksetzen</button>
     </section>
