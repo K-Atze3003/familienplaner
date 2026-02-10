@@ -56,7 +56,16 @@
         .card.done { color: white; transform: scale(0.95); }
         .card .icon { font-size: 40px; margin-bottom: 8px; }
 
-        /* --- WOCHE SLIDER (NEU) --- */
+        /* NEU: Klasse für das eigene Bild (Axolotl) */
+        .icon-img { 
+            height: 50px; 
+            width: auto; 
+            margin-bottom: 8px; 
+            pointer-events: none; 
+            object-fit: contain;
+        }
+
+        /* --- WOCHE SLIDER --- */
         .scrolling-wrapper {
             display: flex;
             overflow-x: auto;
@@ -66,19 +75,18 @@
             width: 100%;
             padding-bottom: 10px;
             gap: 15px;
-            scroll-snap-type: x mandatory; /* Einrasten */
+            scroll-snap-type: x mandatory; 
         }
-        /* Scrollbalken verstecken */
         .scrolling-wrapper::-webkit-scrollbar { display: none; }
         
         .week-card {
-            flex: 0 0 auto; /* Verhindert Schrumpfen */
-            width: 140px;   /* Feste Breite für Slide */
-            height: 160px;  /* Etwas höher */
+            flex: 0 0 auto; 
+            width: 140px;   
+            height: 160px;  
             scroll-snap-align: start;
             align-items: flex-start; padding: 15px; 
             justify-content: flex-start;
-            white-space: normal; /* Damit Text umbricht */
+            white-space: normal; 
         }
         .week-card.today { border: 2px solid var(--primary-blue); background: #f0f8ff; }
         .day-header { font-weight: bold; color: #8e8e93; font-size: 14px; margin-bottom: 10px; width: 100%; border-bottom: 1px solid #eee; padding-bottom: 5px; }
@@ -118,7 +126,6 @@
         .fab { position: fixed; bottom: 100px; right: 20px; background: var(--primary-blue); color: white; width: 56px; height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 12px rgba(0,122,255,0.4); border: none; cursor: pointer; z-index: 900; transition: transform 0.2s; }
         .fab:active { transform: scale(0.9); }
 
-        /* Countdown Text */
         .countdown-text { color: var(--primary-blue); font-weight: bold; font-size: 14px; text-align: right; }
 
         /* --- MODAL --- */
@@ -142,7 +149,7 @@
         .inp-std { border: none; font-size: 16px; width: 100%; outline: none; background: transparent; height: 100%; }
         select.inp-std { -webkit-appearance: none; background: white; }
 
-        /* --- NAV 7 ITEMS (Eng aber passt) --- */
+        /* --- NAV 7 ITEMS --- */
         .tab-bar { position: fixed; bottom: 0; width: 100%; height: 85px; background: var(--tab-bar-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); display: flex; justify-content: space-between; align-items: center; border-top: 0.5px solid #d1d1d6; padding-bottom: env(safe-area-inset-bottom); z-index: 1000; padding-left:2px; padding-right:2px; }
         .tab-item { display: flex; flex-direction: column; align-items: center; color: #8e8e93; font-size: 9px; text-decoration: none; flex: 1; cursor: pointer; text-align: center; }
         .tab-item.active { color: var(--primary-blue); }
@@ -166,7 +173,12 @@
         <div class="progress-container"><div class="bar-fill"></div></div>
         <div class="grid">
             <div class="card" onclick="toggleTask(this, 0)"><span class="icon">🍎</span><span class="label">Abendessen</span></div>
-            <div class="card" onclick="toggleTask(this, 1)"><span class="icon">🧸</span><span class="label">Aufräumen</span></div>
+            
+            <div class="card" onclick="toggleTask(this, 1)">
+                <img src="IMG_4085.png" class="icon-img" alt="Axolotl">
+                <span class="label">Aufräumen</span>
+            </div>
+
             <div class="card" onclick="toggleTask(this, 2)"><span class="icon">🪥</span><span class="label">Zähneputzen</span></div>
             <div class="card" onclick="toggleTask(this, 3)"><span class="icon">👚</span><span class="label">Schlafanzug</span></div>
             <div class="card" onclick="toggleTask(this, 4)"><span class="icon">🧺</span><span class="label">Wäschesack</span></div>    
@@ -222,13 +234,11 @@
 
     <section id="settings">
         <h1>Einstellungen ⚙️</h1>
-        
         <div class="list-card">
             <strong>Müll-Filter</strong>
             <p style="font-size:13px; color:#8e8e93;">Gib Begriffe ein, die NICHT angezeigt werden sollen (z.B. 4-wöchentlich).</p>
             <input type="text" id="filterInput" placeholder="Filterbegriffe..." onchange="saveFilter()" style="width:100%; border:1px solid #ddd; border-radius:8px; padding: 10px; margin-top:5px; box-sizing:border-box;">
         </div>
-
         <div class="list-card">
             <strong>Müllkalender Import</strong>
             <p style="font-size:13px; color:#8e8e93;">Lade eine .ics Datei deines Entsorgers hoch.</p>
@@ -237,7 +247,6 @@
                 <i class="fas fa-file-import"></i> Datei auswählen
             </label>
         </div>
-
         <div class="list-card" onclick="if(confirm('Alle Daten löschen?')) { localStorage.clear(); location.reload(); }">
             <strong style="color:var(--danger-red);">App zurücksetzen</strong>
             <p style="font-size:13px; color:#8e8e93;">Löscht alle Kontakte und Aufgaben.</p>
@@ -410,7 +419,6 @@
             const tasks = JSON.parse(localStorage.getItem('familyTasks')) || [];
             const today = new Date();
 
-            // Erzeuge 14 Tage (2 Wochen) für den Slider
             for (let i = 0; i < 14; i++) {
                 let currentDay = new Date(today);
                 currentDay.setDate(today.getDate() + i);
@@ -633,7 +641,7 @@
             }
         }
 
-        // --- KALENDER HELPER (Settings moved) ---
+        // --- HELPER ---
         function saveFilter() { localStorage.setItem('trashFilter', document.getElementById('filterInput').value); }
         
         function importIcs(e) { 
@@ -669,30 +677,21 @@
             });
         }
 
-        // --- COUNTDOWN LOGIK (NEU) ---
+        // --- COUNTDOWN LOGIK ---
         function getDaysUntil(dateString) {
-            // dateString format YYYY-MM-DD
             const today = new Date();
             today.setHours(0,0,0,0);
-            
             const [y, m, d] = dateString.split('-').map(Number);
             let bday = new Date(today.getFullYear(), m - 1, d);
-            
-            if (bday < today) {
-                bday.setFullYear(today.getFullYear() + 1);
-            }
-            
+            if (bday < today) { bday.setFullYear(today.getFullYear() + 1); }
             const diffTime = bday - today;
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-            return diffDays;
+            return Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
         }
 
         function renderBirthdays() {
             const div = document.getElementById('birthdayDisplay');
             const contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
             div.innerHTML = '<h3>Geburtstage 🎂</h3>';
-            
-            // Filter und Sortieren nach "Tagen bis"
             let upcoming = contacts.filter(c => c.bday).map(c => {
                 return { ...c, daysUntil: getDaysUntil(c.bday) };
             }).sort((a,b) => a.daysUntil - b.daysUntil);
@@ -704,10 +703,7 @@
 
                  div.innerHTML += `
                  <div class="list-card" style="flex-direction:row; justify-content:space-between; align-items:center;">
-                    <div>
-                        <strong>${b.name}</strong>
-                        <div style="font-size:12px; color:#999;">${b.bday.slice(8)}.${b.bday.slice(5,7)}.</div>
-                    </div>
+                    <div><strong>${b.name}</strong><div style="font-size:12px; color:#999;">${b.bday.slice(8)}.${b.bday.slice(5,7)}.</div></div>
                     <span class="countdown-text">${text}</span>
                  </div>`;
             });
@@ -722,6 +718,7 @@
             else if(document.querySelector('#weekly.active')) renderWeekly();
             else if(document.querySelector('#tasks.active')) renderTasks();
             else if(document.querySelector('#calendar.active')) { renderTrash(); renderBirthdays(); }
+            // Settings needs no render function
         };
     </script>
 </body>
