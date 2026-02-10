@@ -183,7 +183,7 @@
             </div>
             
             <div class="card" onclick="toggleTask(this, 1)">
-                <img src="Marlene_Axolotl .png" class="icon-img" alt="Axolotl"
+                <img src="Marlene_Axolotl .png" class="icon-img" alt="Axolotl">
                 <span class="label">Aufräumen</span>
             </div>
 
@@ -208,12 +208,12 @@
             </div>
 
             <div class="card" onclick="toggleTask(this, 6)">
-                <img src="Buch.png" class="icon-img" alt="Haare">
+                <img src="Buch.png" class="icon-img" alt="Buch">
                 <span class="label">Nachtgeschichte</span>
             </div>
 
             <div class="card" onclick="toggleTask(this, 7)">
-                <img src="Schlafen.png" class="icon-img" alt="Haare">
+                <img src="Schlafen.png" class="icon-img" alt="Schlafen">
                 <span class="label">Gute Nacht</span>
             </div>
         </div>
@@ -224,12 +224,45 @@
         <h1>Linda 🌙</h1>
         <div class="progress-container"><div class="bar-fill"></div></div>
         <div class="grid">
-            <div class="card" onclick="toggleTask(this, 0)"><span class="icon">🍎</span><span class="label">Abendessen</span></div>
-            <div class="card" onclick="toggleTask(this, 1)"><span class="icon">🧸</span><span class="label">Aufräumen</span></div>
-            <div class="card" onclick="toggleTask(this, 2)"><span class="icon">🪥</span><span class="label">Zähneputzen</span></div>
-            <div class="card" onclick="toggleTask(this, 3)"><span class="icon">👚</span><span class="label">Schlafanzug</span></div>
-            <div class="card" onclick="toggleTask(this, 4)"><span class="icon">🧺</span><span class="label">Wäschesack</span></div>    
-            <div class="card" onclick="toggleTask(this, 5)"><span class="icon">🪮</span><span class="label">Haarekämmen</span></div>
+            <div class="card" onclick="toggleTask(this, 0)">
+                <img src="Essen.png" class="icon-img" alt="Essen">
+                <span class="label">Abendessen</span>
+            </div>
+            
+            <div class="card" onclick="toggleTask(this, 1)">
+                <img src="Linda_Muh.png" class="icon-img" alt="Axolotl">
+                <span class="label">Aufräumen</span>
+            </div>
+
+            <div class="card" onclick="toggleTask(this, 2)">
+                <img src="Zaehneputzen.png" class="icon-img" alt="Zähne">
+                <span class="label">Zähneputzen</span>
+            </div>
+
+            <div class="card" onclick="toggleTask(this, 3)">
+                <img src="Schlafanzug.png" class="icon-img" alt="Schlafanzug">
+                <span class="label">Schlafanzug</span>
+            </div>
+
+            <div class="card" onclick="toggleTask(this, 4)">
+                <span class="icon">🧺</span>
+                <span class="label">Wäschekorb</span>
+            </div>    
+
+            <div class="card" onclick="toggleTask(this, 5)">
+                <img src="Kaemmen.png" class="icon-img" alt="Haare">
+                <span class="label">Haarekämmen</span>
+            </div>
+
+            <div class="card" onclick="toggleTask(this, 6)">
+                <img src="Buch.png" class="icon-img" alt="Buch">
+                <span class="label">Nachtgeschichte</span>
+            </div>
+
+            <div class="card" onclick="toggleTask(this, 7)">
+                <img src="Schlafen.png" class="icon-img" alt="Schlafen">
+                <span class="label">Gute Nacht</span>
+            </div>
         </div>
         <button style="margin-top: 30px; background: none; border: none; color: #8e8e93; font-size: 14px;" onclick="resetRoutine('routineLinda')">Lindas Liste zurücksetzen</button>
     </section>
@@ -409,7 +442,13 @@
             }
             
             if(done === cards.length && done > 0) {
-                triggerConfetti();
+                // UNTERSCHEIDUNG: Wer ist fertig?
+                if(sectionId === 'routineLinda') {
+                    triggerFireworks(); // Linda bekommt Feuerwerk
+                } else {
+                    triggerConfetti(); // Marlene bekommt normales Konfetti
+                }
+
                 document.getElementById('videoOverlay').style.display = 'flex';
                 document.getElementById('rewardVideo').play();
                 document.getElementById('finalSuccess').play().catch(()=>{});
@@ -417,6 +456,7 @@
             }
         }
         
+        // MARLENE: Normales Konfetti (Regen)
         function triggerConfetti() {
             var duration = 3 * 1000;
             var animationEnd = Date.now() + duration;
@@ -429,6 +469,30 @@
                 confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.1, 0.3), y: Math.random() - 0.2 } }));
                 confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.7, 0.9), y: Math.random() - 0.2 } }));
             }, 250);
+        }
+
+        // LINDA: Feuerwerk (Raketen/Explosionen)
+        function triggerFireworks() {
+             var duration = 5 * 1000;
+             var animationEnd = Date.now() + duration;
+
+             var interval = setInterval(function() {
+                 var timeLeft = animationEnd - Date.now();
+                 if (timeLeft <= 0) return clearInterval(interval);
+
+                 // Zufällige Position für Explosion
+                 var randomX = Math.random();
+                 var randomY = Math.random() * 0.5; // Eher oben explodieren
+
+                 confetti({
+                     particleCount: 100,
+                     startVelocity: 30,
+                     spread: 360,
+                     origin: { x: randomX, y: randomY },
+                     zIndex: 6000,
+                     colors: ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff'] // Bunte Farben
+                 });
+             }, 800); // Alle 800ms eine Explosion
         }
 
         function closeVideo() {
