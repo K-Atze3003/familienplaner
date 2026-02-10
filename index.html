@@ -8,6 +8,7 @@
     <title>FamilyHub Pro</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <style>
         :root {
@@ -39,11 +40,18 @@
         h3 { width: 100%; margin-top: 25px; color: #3a3a3c; border-bottom: 1px solid #d1d1d6; padding-bottom: 5px; font-size: 18px; font-weight: 600; }
         .abc-header { width: 100%; padding: 10px 15px; font-weight: bold; color: #8e8e93; background: transparent; font-size: 14px; margin-top: 5px; }
 
-        /* --- ROUTINE CARDS --- */
-        .progress-container { width: 100%; height: 18px; background: #e5e5ea; border-radius: 10px; margin: 20px 0; overflow: hidden; }
-        /* Wir nutzen jetzt Klassen statt IDs für die Bars, damit wir sie pro Sektion steuern können */
-        .bar-fill { width: 0%; height: 100%; transition: width 0.4s; }
+        /* --- ROUTINE CARDS & ANIMATION --- */
+        .progress-container { width: 100%; height: 18px; background: #e5e5ea; border-radius: 10px; margin: 20px 0; overflow: hidden; position: relative; }
+        .bar-fill { width: 0%; height: 100%; transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); } /* Bouncy transition */
         
+        /* Animation Klasse für den Balken */
+        .bar-bounce { animation: bounceBar 0.5s ease; }
+        @keyframes bounceBar {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
         /* Marlene Style */
         #routineMarlene .bar-fill { background: linear-gradient(90deg, var(--marlene-color), #ff5e3a); }
         #routineMarlene .card.done { background: var(--marlene-color); }
@@ -125,7 +133,6 @@
         .tab-item i { font-size: 20px; margin-bottom: 4px; }
         
         #videoOverlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:5000; justify-content:center; align-items:center; flex-direction:column; color: white; }
-        #confetti { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 100px; display: none; z-index: 6000; pointer-events: none; }
     </style>
 </head>
 <body>
@@ -209,8 +216,7 @@
             <i class="fas fa-child"></i><span>Marlene</span>
         </div>
         <div class="tab-item" onclick="showTab('routineLinda', this)">
-            <i class="fas fa-child-dress"></i><span>Linda</span>
-        </div>
+            <i class="fas fa-female"></i><span>Linda</span> </div>
         <div class="tab-item" onclick="showTab('weekly', this)">
             <i class="fas fa-calendar-week"></i><span>Woche</span>
         </div>
@@ -224,8 +230,6 @@
             <i class="fas fa-address-book"></i><span>Kontakte</span>
         </div>
     </nav>
-
-    <div id="confetti">🎉</div>
 
     <div id="contactModal" class="modal-overlay">
         <div class="modal-sheet">
@@ -321,18 +325,42 @@
             const bar = container.querySelector('.bar-fill');
             bar.style.width = (done/cards.length*100) + '%';
             
+            // HÜPF-ANIMATION
+            if(done > 0) {
+                const containerBar = container.querySelector('.progress-container');
+                containerBar.classList.remove('bar-bounce'); // Reset
+                void containerBar.offsetWidth; // Trigger Reflow
+                containerBar.classList.add('bar-bounce');
+            }
+            
             if(done === cards.length && done > 0) {
+                triggerConfetti(); // Echtes Konfetti!
                 document.getElementById('videoOverlay').style.display = 'flex';
-                document.getElementById('confetti').style.display = 'block';
                 document.getElementById('rewardVideo').play();
                 document.getElementById('finalSuccess').play().catch(()=>{});
                 setTimeout(closeVideo, 8000);
             }
         }
+        
+        function triggerConfetti() {
+            var duration = 3 * 1000;
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 6000 };
+
+            function randomInOut(min, max) { return Math.random() * (max - min) + min; }
+
+            var interval = setInterval(function() {
+                var timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) { return clearInterval(interval); }
+                var particleCount = 50 * (timeLeft / duration);
+                // Konfetti von beiden Seiten feuern
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.1, 0.3), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+        }
 
         function closeVideo() {
             document.getElementById('videoOverlay').style.display = 'none';
-            document.getElementById('confetti').style.display = 'none';
             document.getElementById('rewardVideo').pause();
         }
 
