@@ -208,7 +208,7 @@
             </div>
 
             <div class="card" onclick="toggleTask(this, 6)">
-                <img src="Buch.png" class="icon-img" alt="Buch" /style="height: 55px;">
+                <img src="Buch.png" class="icon-img" alt="Buch" style="height: 85px;">
                 <span class="label">Nachtgeschichte</span>
             </div>
 
@@ -255,7 +255,7 @@
             </div>
 
             <div class="card" onclick="toggleTask(this, 6)">
-                <img src="Buch.png" class="icon-img" alt="Buch" /style="height: 55px;">
+                <img src="Buch.png" class="icon-img" alt="Buch" style="height: 85px;">
                 <span class="label">Nachtgeschichte</span>
             </div>
 
@@ -269,7 +269,7 @@
 
     <div id="videoOverlay" onclick="closeVideo()">
         <video id="rewardVideo" width="90%" playsinline>
-            <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+            <source src="Unser%20Sandman%20Camping.mp4" type="video/mp4">
         </video>
         <h2 style="margin-top:20px;">Super gemacht! 🎉</h2>
     </div>
@@ -452,7 +452,7 @@
                 document.getElementById('videoOverlay').style.display = 'flex';
                 document.getElementById('rewardVideo').play();
                 document.getElementById('finalSuccess').play().catch(()=>{});
-                setTimeout(closeVideo, 8000);
+                setTimeout(closeVideo, 8000); // Automatisches Schließen nach 8 Sekunden
             }
         }
         
