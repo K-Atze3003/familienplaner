@@ -14,10 +14,8 @@
         :root {
             --bg-color: #f0f2f5;
             --primary-blue: #007aff;
-            /* BEIDE JETZT LILA */
             --marlene-color: #af52de; 
             --linda-color: #af52de;
-            
             --success-green: #34c759;
             --danger-red: #ff3b30;
             --fav-yellow: #ffcc00;
@@ -48,11 +46,8 @@
         .bar-bounce { animation: bounceBar 0.5s ease; }
         @keyframes bounceBar { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
-        /* Marlene Style (Jetzt Lila Verlauf) */
         #routineMarlene .bar-fill { background: linear-gradient(90deg, var(--marlene-color), #5856d6); }
         #routineMarlene .card.done { background: var(--marlene-color); }
-        
-        /* Linda Style */
         #routineLinda .bar-fill { background: linear-gradient(90deg, var(--linda-color), #5856d6); }
         #routineLinda .card.done { background: var(--linda-color); }
 
@@ -61,41 +56,32 @@
         .card.done { color: white; transform: scale(0.95); }
         .card .icon { font-size: 40px; margin-bottom: 8px; }
 
-        /* BILDER KLASSE */
-        .icon-img { 
-            height: 75px; /* Standardgröße */
-            width: auto; 
-            margin-bottom: 8px; 
-            pointer-events: none; 
-            object-fit: contain;
-        }
+        .icon-img { height: 55px; width: auto; margin-bottom: 8px; pointer-events: none; object-fit: contain; }
 
         /* --- WOCHE SLIDER --- */
-        .scrolling-wrapper {
-            display: flex;
-            overflow-x: auto;
-            overflow-y: hidden;
-            white-space: nowrap;
-            -webkit-overflow-scrolling: touch;
-            width: 100%;
-            padding-bottom: 10px;
-            gap: 15px;
-            scroll-snap-type: x mandatory; 
-        }
+        .scrolling-wrapper { display: flex; overflow-x: auto; overflow-y: hidden; white-space: nowrap; -webkit-overflow-scrolling: touch; width: 100%; padding-bottom: 10px; gap: 15px; scroll-snap-type: x mandatory; }
         .scrolling-wrapper::-webkit-scrollbar { display: none; }
-        
-        .week-card {
-            flex: 0 0 auto; 
-            width: 140px;   
-            height: 160px;  
-            scroll-snap-align: start;
-            align-items: flex-start; padding: 15px; 
-            justify-content: flex-start;
-            white-space: normal; 
-        }
+        .week-card { flex: 0 0 auto; width: 140px; height: 160px; scroll-snap-align: start; align-items: flex-start; padding: 15px; justify-content: flex-start; white-space: normal; }
         .week-card.today { border: 2px solid var(--primary-blue); background: #f0f8ff; }
         .day-header { font-weight: bold; color: #8e8e93; font-size: 14px; margin-bottom: 10px; width: 100%; border-bottom: 1px solid #eee; padding-bottom: 5px; }
         .event-badge { font-size: 11px; margin-bottom: 4px; padding: 4px 8px; border-radius: 6px; width: 100%; box-sizing: border-box; }
+
+        /* --- BAUPLANER STYLES (NEU) --- */
+        .construction-card {
+            background: white; width: 100%; border-radius: 15px; margin-bottom: 15px; padding: 15px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; flex-direction: column;
+        }
+        .con-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .con-title { font-weight: 700; font-size: 16px; color: #333; }
+        .con-dates { font-size: 13px; color: #8e8e93; display: flex; align-items: center; gap: 5px; }
+        .con-status { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+        .status-planned { background: #f2f2f7; color: #8e8e93; }
+        .status-active { background: #e8f5e9; color: var(--success-green); }
+        .status-done { background: #eef5ff; color: var(--primary-blue); }
+        
+        .timeline-bar { width: 100%; height: 8px; background: #f2f2f7; border-radius: 4px; overflow: hidden; margin-top: 5px; }
+        .timeline-progress { height: 100%; background: var(--success-green); width: 0%; transition: width 0.5s; }
+        .timeline-finished { background: var(--primary-blue); width: 100%; }
 
         /* --- STYLES --- */
         .task-item { background: white; width: 100%; border-radius: 15px; margin-bottom: 10px; padding: 15px; display: flex; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.03); transition: 0.3s; }
@@ -153,12 +139,21 @@
         .inp-icon { width: 30px; text-align: center; font-size: 18px; margin-right: 15px; }
         .inp-std { border: none; font-size: 16px; width: 100%; outline: none; background: transparent; height: 100%; }
         select.inp-std { -webkit-appearance: none; background: white; }
+        
+        /* Checkbox styling für Bauplaner */
+        .toggle-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--primary-blue); }
+        input:checked + .slider:before { transform: translateX(22px); }
 
-        /* --- NAV 7 ITEMS --- */
+        /* --- NAV ITEMS (8 now) --- */
         .tab-bar { position: fixed; bottom: 0; width: 100%; height: 85px; background: var(--tab-bar-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); display: flex; justify-content: space-between; align-items: center; border-top: 0.5px solid #d1d1d6; padding-bottom: env(safe-area-inset-bottom); z-index: 1000; padding-left:2px; padding-right:2px; }
-        .tab-item { display: flex; flex-direction: column; align-items: center; color: #8e8e93; font-size: 9px; text-decoration: none; flex: 1; cursor: pointer; text-align: center; }
+        .tab-item { display: flex; flex-direction: column; align-items: center; color: #8e8e93; font-size: 8px; text-decoration: none; flex: 1; cursor: pointer; text-align: center; }
         .tab-item.active { color: var(--primary-blue); }
-        .tab-item i { font-size: 18px; margin-bottom: 4px; }
+        .tab-item i { font-size: 16px; margin-bottom: 4px; }
         
         #videoOverlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:5000; justify-content:center; align-items:center; flex-direction:column; color: white; }
     </style>
@@ -208,7 +203,7 @@
             </div>
 
             <div class="card" onclick="toggleTask(this, 6)">
-                <img src="Buch.png" class="icon-img" alt="Buch" style="height:75px;">
+                <img src="Buch.png" class="icon-img" alt="Buch" style="height: 85px;">
                 <span class="label">Nachtgeschichte</span>
             </div>
 
@@ -230,7 +225,7 @@
             </div>
             
             <div class="card" onclick="toggleTask(this, 1)">
-                <img src="Linda_Muh.png" class="icon-img" alt="Essen">
+                <img src="Marlene_Axolotl .png" class="icon-img" alt="Axolotl">
                 <span class="label">Aufräumen</span>
             </div>
 
@@ -245,7 +240,7 @@
             </div>
 
             <div class="card" onclick="toggleTask(this, 4)">
-                <span class="icon">🧺</span> <style="height: 75px;">
+                <span class="icon">🧺</span>
                 <span class="label">Wäschekorb</span>
             </div>    
 
@@ -255,7 +250,7 @@
             </div>
 
             <div class="card" onclick="toggleTask(this, 6)">
-                <img src="Buch.png" class="icon-img" alt="Buch" style="height: 75px;">
+                <img src="Buch.png" class="icon-img" alt="Buch" style="height: 85px;">
                 <span class="label">Nachtgeschichte</span>
             </div>
 
@@ -284,6 +279,12 @@
         <h1>Aufgaben ✅</h1>
         <div id="taskList" style="width: 100%;"></div>
         <button class="fab" onclick="openTaskModal()"><i class="fas fa-plus"></i></button>
+    </section>
+
+    <section id="construction">
+        <h1>Bauplaner 🔨</h1>
+        <div id="constructionList" style="width: 100%;"></div>
+        <p style="text-align:center; color:#ccc; font-size:12px; margin-top:20px;">Neue Projekte über den Tab "Aufgaben" hinzufügen.</p>
     </section>
 
     <section id="calendar">
@@ -332,6 +333,9 @@
         <div class="tab-item" onclick="showTab('tasks', this)">
             <i class="fas fa-check-circle"></i><span>Aufg.</span>
         </div>
+        <div class="tab-item" onclick="showTab('construction', this)">
+            <i class="fas fa-hammer"></i><span>Bau</span>
+        </div>
         <div class="tab-item" onclick="showTab('calendar', this)">
             <i class="fas fa-calendar-alt"></i><span>Planer</span>
         </div>
@@ -374,7 +378,7 @@
             </div>
             <div class="modal-body">
                 <div class="input-card">
-                    <input type="text" id="taskTitle" class="inp-big" placeholder="Was ist zu tun?">
+                    <input type="text" id="taskTitle" class="inp-big" placeholder="Projekt / Aufgabe">
                 </div>
                 <div class="input-card">
                     <i class="fas fa-user inp-icon" style="color: var(--primary-blue);"></i>
@@ -382,13 +386,33 @@
                         <option value="">Für wen?</option>
                     </select>
                 </div>
+                
                 <div class="input-card">
-                    <i class="fas fa-calendar-check inp-icon" style="color: var(--danger-red);"></i>
+                    <i class="fas fa-hourglass-start inp-icon" style="color: #8e8e93;"></i>
                     <div style="width:100%;">
-                        <label style="font-size:12px; color:#8e8e93;">Erledigen bis:</label>
+                        <label style="font-size:12px; color:#8e8e93;">Start Datum:</label>
+                        <input type="date" id="taskStart" class="inp-std">
+                    </div>
+                </div>
+
+                <div class="input-card">
+                    <i class="fas fa-flag-checkered inp-icon" style="color: var(--danger-red);"></i>
+                    <div style="width:100%;">
+                        <label style="font-size:12px; color:#8e8e93;">Ende / Fällig:</label>
                         <input type="date" id="taskDue" class="inp-std">
                     </div>
                 </div>
+
+                <div class="input-card">
+                    <div class="toggle-row">
+                        <span><i class="fas fa-hammer" style="margin-right:10px; color:#555;"></i>Im Bauplaner anzeigen</span>
+                        <label class="switch">
+                            <input type="checkbox" id="taskIsConstruction">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -408,6 +432,7 @@
             if(id === 'contacts') { renderContacts(); }
             if(id === 'weekly') { renderWeekly(); }
             if(id === 'tasks') { renderTasks(); }
+            if(id === 'construction') { renderConstruction(); }
         }
 
         function closeModal(id) {
@@ -442,21 +467,22 @@
             }
             
             if(done === cards.length && done > 0) {
-                // UNTERSCHEIDUNG: Wer ist fertig?
                 if(sectionId === 'routineLinda') {
-                    triggerFireworks(); // Linda bekommt Feuerwerk
+                    triggerFireworks();
                 } else {
-                    triggerConfetti(); // Marlene bekommt normales Konfetti
+                    triggerConfetti();
                 }
 
                 document.getElementById('videoOverlay').style.display = 'flex';
-                document.getElementById('rewardVideo').play();
+                const videoEl = document.getElementById('rewardVideo');
+                videoEl.play();
                 document.getElementById('finalSuccess').play().catch(()=>{});
-                setTimeout(closeVideo, 8000); // Automatisches Schließen nach 8 Sekunden
+                videoEl.onended = function() {
+                    closeVideo();
+                };
             }
         }
         
-        // MARLENE: Normales Konfetti (Regen)
         function triggerConfetti() {
             var duration = 3 * 1000;
             var animationEnd = Date.now() + duration;
@@ -471,28 +497,16 @@
             }, 250);
         }
 
-        // LINDA: Feuerwerk (Raketen/Explosionen)
         function triggerFireworks() {
              var duration = 5 * 1000;
              var animationEnd = Date.now() + duration;
-
              var interval = setInterval(function() {
                  var timeLeft = animationEnd - Date.now();
                  if (timeLeft <= 0) return clearInterval(interval);
-
-                 // Zufällige Position für Explosion
                  var randomX = Math.random();
-                 var randomY = Math.random() * 0.5; // Eher oben explodieren
-
-                 confetti({
-                     particleCount: 100,
-                     startVelocity: 30,
-                     spread: 360,
-                     origin: { x: randomX, y: randomY },
-                     zIndex: 6000,
-                     colors: ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff'] // Bunte Farben
-                 });
-             }, 800); // Alle 800ms eine Explosion
+                 var randomY = Math.random() * 0.5;
+                 confetti({ particleCount: 100, startVelocity: 30, spread: 360, origin: { x: randomX, y: randomY }, zIndex: 6000, colors: ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff'] });
+             }, 800);
         }
 
         function closeVideo() {
@@ -562,7 +576,9 @@
             });
             document.getElementById('taskTitle').value = '';
             document.getElementById('taskAssignee').value = '';
+            document.getElementById('taskStart').value = '';
             document.getElementById('taskDue').value = '';
+            document.getElementById('taskIsConstruction').checked = false;
             const modal = document.getElementById('taskModal');
             modal.style.display = 'flex';
             setTimeout(() => modal.classList.add('active'), 10);
@@ -571,11 +587,23 @@
         function saveTask() {
             const title = document.getElementById('taskTitle').value.trim();
             if(!title) { alert("Bitte Aufgabe eingeben"); return; }
+            
+            const startDate = document.getElementById('taskStart').value;
+            const dueDate = document.getElementById('taskDue').value;
+            const isConstruction = document.getElementById('taskIsConstruction').checked;
+
+            if(isConstruction && (!startDate || !dueDate)) {
+                alert("Für den Bauplaner werden Start- und Enddatum benötigt!");
+                return;
+            }
+
             const newTask = {
                 id: Date.now(),
                 title: title,
                 assignee: document.getElementById('taskAssignee').value,
-                due: document.getElementById('taskDue').value,
+                start: startDate,
+                due: dueDate,
+                isConstruction: isConstruction,
                 done: false
             };
             let tasks = JSON.parse(localStorage.getItem('familyTasks')) || [];
@@ -595,7 +623,8 @@
                     if(s) { s.currentTime=0; s.play().catch(()=>{}); }
                 }
                 localStorage.setItem('familyTasks', JSON.stringify(tasks));
-                renderTasks();
+                renderTasks(); // Updates Task list
+                if(document.querySelector('#construction.active')) renderConstruction(); // Updates Bauplaner if active
             }
         }
 
@@ -604,6 +633,7 @@
             let tasks = JSON.parse(localStorage.getItem('familyTasks')) || [];
             localStorage.setItem('familyTasks', JSON.stringify(tasks.filter(t => t.id !== id)));
             renderTasks();
+            if(document.querySelector('#construction.active')) renderConstruction();
         }
 
         function renderTasks() {
@@ -618,17 +648,100 @@
             tasks.forEach(t => {
                 const isOverdue = !t.done && t.due && t.due < new Date().toISOString().split('T')[0];
                 const dueDisplay = t.due ? new Date(t.due).toLocaleDateString('de-DE') : '';
+                
+                // Extra Icon if Construction
+                const hammerIcon = t.isConstruction ? '<i class="fas fa-hammer" style="color:#555; margin-left:5px;"></i>' : '';
+
                 list.innerHTML += `
                 <div class="task-item ${t.done ? 'completed' : ''}">
                     <div class="checkbox-wrapper" onclick="toggleTaskState(${t.id})">${t.done ? '<i class="fas fa-check"></i>' : ''}</div>
                     <div class="task-content">
-                        <span class="task-title">${t.title}</span>
+                        <span class="task-title">${t.title} ${hammerIcon}</span>
                         <div class="task-meta">
                             ${t.assignee ? `<span class="task-assignee"><i class="fas fa-user-circle"></i> ${t.assignee}</span>` : ''}
                             ${t.due ? `<span class="task-due ${isOverdue?'overdue':''}"><i class="fas fa-clock"></i> ${dueDisplay}</span>` : ''}
                         </div>
                     </div>
                     ${t.done ? `<button class="btn-del-mini" onclick="deleteTask(${t.id})"><i class="fas fa-trash"></i></button>` : ''}
+                </div>`;
+            });
+        }
+
+        // --- BAUPLANER LOGIK (NEU) ---
+        function renderConstruction() {
+            const list = document.getElementById('constructionList');
+            let tasks = JSON.parse(localStorage.getItem('familyTasks')) || [];
+            
+            // Nur Bau-Tasks filtern
+            const constructionTasks = tasks.filter(t => t.isConstruction && t.start && t.due);
+            
+            // Sortieren nach Startdatum
+            constructionTasks.sort((a,b) => a.start.localeCompare(b.start));
+
+            list.innerHTML = '';
+            if(constructionTasks.length === 0) { 
+                list.innerHTML = '<p style="text-align:center; color:#999; margin-top:40px;">Keine Bauprojekte geplant.</p>'; 
+                return; 
+            }
+
+            const today = new Date();
+            today.setHours(0,0,0,0);
+
+            constructionTasks.forEach(t => {
+                const start = new Date(t.start);
+                const end = new Date(t.due);
+                
+                let status = "Geplant";
+                let statusClass = "status-planned";
+                let progress = 0;
+
+                if(t.done) {
+                    status = "Fertig";
+                    statusClass = "status-done";
+                    progress = 100;
+                } else {
+                    if (today < start) {
+                        // Noch nicht begonnen
+                        status = "Geplant";
+                        statusClass = "status-planned";
+                        progress = 0;
+                    } else if (today > end) {
+                        // Überfällig
+                        status = "Überfällig";
+                        statusClass = "status-active"; // Rot wäre auch möglich
+                        progress = 100; // Balken voll, aber nicht "done"
+                    } else {
+                        // Aktiv / Mittendrin
+                        status = "Aktiv";
+                        statusClass = "status-active";
+                        // Berechne % Zeit
+                        const totalTime = end - start;
+                        const elapsedTime = today - start;
+                        if(totalTime > 0) progress = Math.round((elapsedTime / totalTime) * 100);
+                    }
+                }
+
+                // Datumsformat
+                const dStart = start.toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit'});
+                const dEnd = end.toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit'});
+
+                // Progress Bar Style
+                let barClass = "timeline-progress";
+                if(t.done) barClass += " timeline-finished";
+
+                list.innerHTML += `
+                <div class="construction-card" onclick="if(confirm('Zur Aufgabe springen?')) { showTab('tasks', document.querySelector('.tab-item:nth-child(4)')); }">
+                    <div class="con-header">
+                        <div class="con-title">${t.title}</div>
+                        <div class="con-status ${statusClass}">${status}</div>
+                    </div>
+                    <div class="con-dates">
+                        <i class="far fa-calendar-alt"></i> ${dStart} - ${dEnd}
+                        ${t.assignee ? ` &bull; ${t.assignee}` : ''}
+                    </div>
+                    <div class="timeline-bar">
+                        <div class="${barClass}" style="width: ${progress}%"></div>
+                    </div>
                 </div>`;
             });
         }
@@ -814,8 +927,8 @@
             else if(document.querySelector('#contacts.active')) renderContacts();
             else if(document.querySelector('#weekly.active')) renderWeekly();
             else if(document.querySelector('#tasks.active')) renderTasks();
+            else if(document.querySelector('#construction.active')) renderConstruction();
             else if(document.querySelector('#calendar.active')) { renderTrash(); renderBirthdays(); }
-            // Settings needs no render function
         };
     </script>
 </body>
