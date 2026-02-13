@@ -477,19 +477,15 @@
 
     <script>
         // --- KONFIGURATION START ---
-        
-        // HIER DEINE ECHTEN DATEN EINFÜGEN!
-          const firebaseConfig = {
-                apiKey: "AIzaSyB6gusTv4l6gQDK3EkU01hLCgX9EgVJrJQ",
-                authDomain: "familyhub-e00ez41008068e19zz.firebaseapp.com",
-                projectId: "familyhub-e00ez41008068e19zz",
-                storageBucket: "familyhub-e00ez41008068e19zz.firebasestorage.app",
-                messagingSenderId: "677777476532",
-                appId: "1:677777476532:web:8f005c1d996083e17980e1",
-                measurementId: "G-L9VSMDH34M"
-          };
-            // ... copy paste from firebase ...
-
+        const firebaseConfig = {
+            apiKey: "AIzaSyB6gusTv4l6gQDK3EkU01hLCgX9EgVJrJQ",
+            authDomain: "familyhub-e00ez41008068e19zz.firebaseapp.com",
+            projectId: "familyhub-e00ez41008068e19zz",
+            storageBucket: "familyhub-e00ez41008068e19zz.firebasestorage.app",
+            messagingSenderId: "677777476532",
+            appId: "1:677777476532:web:2568ffdc95dfda387980e1",
+            measurementId: "G-FJRZVYTF49"
+        };
         // --- KONFIGURATION ENDE ---
 
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
@@ -560,7 +556,7 @@
             } else alert("Falscher PIN");
         }
 
-        // --- ROUTINE LOGIK ---
+        // --- ROUTINE LOGIK (WICHTIG: DIESE FUNKTIONEN FEHLTEN!) ---
         function toggleRoutineTask(person, index) {
             const h = new Date().getHours();
             const isValidTime = (h >= 17 && h < 23);
@@ -609,7 +605,7 @@
 
         let videoHasPlayedToday = false;
         function checkCombinedSuccess(data) {
-            const marleneDone = (data.marlene || []).length === 10; // Jetzt 10 Schritte!
+            const marleneDone = (data.marlene || []).length === 10;
             const lindaDone = (data.linda || []).length === 10;
             if(marleneDone && lindaDone && !videoHasPlayedToday) {
                 videoHasPlayedToday = true;
@@ -644,7 +640,6 @@
         // --- BACKUP ---
         function shareBackup() {
             // Wir müssen auch die lokalen "Hybrid" Daten sichern
-            // Wir sammeln alle Keys die mit "task_local_" anfangen
             let localExtras = {};
             for(let i=0; i<localStorage.length; i++) {
                 const key = localStorage.key(i);
@@ -652,13 +647,12 @@
                     localExtras[key] = localStorage.getItem(key);
                 }
             }
-
             const data = {
                 familyContacts: localStorage.getItem('familyContacts'),
                 familyTasks: firebaseTasks,
                 trashData: firebaseTrash,
                 globalPin: globalPin,
-                localExtras: localExtras // Backup der Bauplaner Details
+                localExtras: localExtras
             };
             const jsonStr = JSON.stringify(data, null, 2);
             const file = new File([jsonStr], "familyhub_backup.json", {type: "application/json"});
@@ -684,18 +678,14 @@
                 try {
                     const data = JSON.parse(e.target.result);
                     if(data.familyContacts) localStorage.setItem('familyContacts', data.familyContacts);
-                    
-                    // Restore Local Extras
                     if(data.localExtras) {
                         for (const [key, value] of Object.entries(data.localExtras)) {
                             localStorage.setItem(key, value);
                         }
                     }
-
                     if(data.familyTasks) db.ref('familyTasks').set(data.familyTasks);
                     if(data.trashData) db.ref('trashData').set(data.trashData);
                     if(data.globalPin) db.ref('settings/pin').set(data.globalPin);
-                    
                     alert("Daten erfolgreich eingespielt!");
                     location.reload();
                 } catch(err) { alert("Fehler Datei."); }
@@ -726,7 +716,6 @@
                 const isCon = task.isConstruction || false;
                 document.getElementById('taskIsConstruction').checked = isCon;
                 
-                // HYBRID DATEN LADEN
                 const localData = JSON.parse(localStorage.getItem('task_local_' + task.id) || '{}');
                 document.getElementById('taskBudget').value = localData.budget || '';
                 document.getElementById('taskContact').value = localData.contact || '';
@@ -755,7 +744,6 @@
             const dueDate = document.getElementById('taskDue').value;
             const isConstruction = document.getElementById('taskIsConstruction').checked;
             
-            // Lokale Felder
             const budget = document.getElementById('taskBudget').value;
             const contact = document.getElementById('taskContact').value;
 
@@ -764,7 +752,6 @@
             let tasks = [...firebaseTasks];
             let taskId = currentEditTaskId ? currentEditTaskId : Date.now();
 
-            // HYBRID SPEICHERN (Nur wenn Bauplaner an ist, oder Daten da sind)
             const localPayload = { budget: budget, contact: contact };
             localStorage.setItem('task_local_' + taskId, JSON.stringify(localPayload));
 
@@ -805,7 +792,6 @@
             if(!confirm("Löschen?")) return;
             let tasks = firebaseTasks.filter(t => t.id !== id);
             db.ref('familyTasks').set(tasks);
-            // Auch lokal aufräumen
             localStorage.removeItem('task_local_' + id);
         }
 
@@ -853,7 +839,6 @@
             const today = new Date(); today.setHours(0,0,0,0);
             
             constructionTasks.forEach(t => {
-                // HYBRID DATEN HOLEN
                 const localData = JSON.parse(localStorage.getItem('task_local_' + t.id) || '{}');
                 const budgetVal = localData.budget ? parseInt(localData.budget) : 0;
                 const contactVal = localData.contact || '';
@@ -870,11 +855,8 @@
                 const dEnd = end.toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit'});
                 let barClass = "timeline-progress"; if(t.done) barClass += " timeline-finished";
                 
-                // Visualisierung für Budget (Einfacher Balken der 100% anzeigt wenn Wert da ist, oder man könnte es relativ zu einem Max machen, hier einfach fix)
-                // Da wir kein "Max Budget" haben, zeige ich einfach einen Balken an, der "gefüllt" ist, wenn Budget > 0
                 let budgetHtml = '';
                 if(budgetVal > 0) {
-                    // Wir simulieren einen "Slider" Look (Range Input disabled)
                     budgetHtml = `
                     <div class="budget-wrapper">
                         <div class="budget-label"><span>Budget</span><span>${budgetVal} €</span></div>
@@ -894,7 +876,6 @@
             });
         }
 
-        // Rest of standard functions (Contacts, Trash, Ics) kept same as before but minimalized for space
         function renderContacts() {
             const list = document.getElementById('contactsList');
             let contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
