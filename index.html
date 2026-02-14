@@ -481,11 +481,7 @@
             apiKey: "AIzaSyB6gusTv4l6gQDK3EkU01hLCgX9EgVJrJQ",
             authDomain: "familyhub-e00ez41008068e19zz.firebaseapp.com",
             projectId: "familyhub-e00ez41008068e19zz",
-            
-            // --- HIER DEN LINK AUS DEINEM BILD EINFÜGEN! ---
-            // Beispiel: databaseURL: "https://familyhub-e00ez...firebasedatabase.app",
-            databaseURL: "https://familyhub-e00ez41008068e19zz-default-rtdb.europe-west1.firebasedatabase.app/", 
-
+            databaseURL: "https://familyhub-e00ez41008068e19zz-default-rtdb.europe-west1.firebasedatabase.app/",
             storageBucket: "familyhub-e00ez41008068e19zz.firebasestorage.app",
             messagingSenderId: "677777476532",
             appId: "1:677777476532:web:2568ffdc95dfda387980e1",
@@ -495,7 +491,8 @@
 
         // Firebase initialisieren
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-        const db = firebase.database();
+        // WICHTIG: Explizite URL-Übergabe für Region Europe-West1
+        const db = firebase.database("https://familyhub-e00ez41008068e19zz-default-rtdb.europe-west1.firebasedatabase.app/");
 
         let globalPin = "0000"; 
         let currentEditContactId = null;
@@ -783,12 +780,14 @@
             setTimeout(() => modal.classList.add('active'), 10);
         }
 
+        // --- REPARIERTE SAVE TASK FUNKTION MIT FEEDBACK ---
         function saveTask() {
             const title = document.getElementById('taskTitle').value.trim();
             if(!title) return;
             const startDate = document.getElementById('taskStart').value;
             const dueDate = document.getElementById('taskDue').value;
             const isConstruction = document.getElementById('taskIsConstruction').checked;
+            const assignee = document.getElementById('taskAssignee').value;
             
             const budget = document.getElementById('taskBudget').value;
             const contact = document.getElementById('taskContact').value;
@@ -801,24 +800,33 @@
             const localPayload = { budget: budget, contact: contact };
             localStorage.setItem('task_local_' + taskId, JSON.stringify(localPayload));
 
+            const taskObj = {
+                id: taskId,
+                title: title,
+                assignee: assignee,
+                start: startDate,
+                due: dueDate,
+                isConstruction: isConstruction,
+                done: false
+            };
+
             if(currentEditTaskId) {
                 const idx = tasks.findIndex(t => t.id === currentEditTaskId);
                 if(idx > -1) {
-                    tasks[idx] = { ...tasks[idx], title, assignee: document.getElementById('taskAssignee').value, start: startDate, due: dueDate, isConstruction };
+                    tasks[idx] = { ...tasks[idx], ...taskObj, done: tasks[idx].done };
                 }
             } else {
-                tasks.push({
-                    id: taskId,
-                    title: title,
-                    assignee: document.getElementById('taskAssignee').value,
-                    start: startDate,
-                    due: dueDate,
-                    isConstruction: isConstruction,
-                    done: false
-                });
+                tasks.push(taskObj);
             }
-            db.ref('familyTasks').set(tasks);
-            closeModal('taskModal');
+
+            // Senden mit Feedback
+            db.ref('familyTasks').set(tasks)
+                .then(() => {
+                    closeModal('taskModal');
+                })
+                .catch(err => {
+                    alert("Fehler beim Speichern der Aufgabe: " + err.message);
+                });
         }
 
         function toggleTaskState(id) {
@@ -839,6 +847,62 @@
             let tasks = firebaseTasks.filter(t => t.id !== id);
             db.ref('familyTasks').set(tasks);
             localStorage.removeItem('task_local_' + id);
+        }
+
+        // --- KONTAKTE ---
+        function saveContact() {
+            const name = document.getElementById('inpName').value.trim();
+            if(!name) return;
+            
+            // Lokale Kontakte laden
+            let contacts = JSON.parse(localStorage.getItem('familyContacts')) || [];
+            
+            // Daten aus dem Modal sammeln
+            const newContact = {
+                id: currentEditContactId || Date.now(),
+                name: name,
+                rel: document.getElementById('inpRel').value,
+                phone: document.getElementById('inpPhone').value,
+                addr: document.getElementById('inpAddr').value,
+                bday: document.getElementById('inpBday').value,
+                isFav: document.getElementById('favToggle').classList.contains('active')
+            };
+
+            if (currentEditContactId) {
+                // Bearbeiten: Finde den Index und ersetze das Objekt
+                const index = contacts.findIndex(c => c.id === currentEditContactId);
+                if (index > -1) {
+                    contacts[index] = newContact;
+                }
+            } else {
+                // Neu erstellen
+                contacts.push(newContact);
+            }
+
+            // Speichern und UI aktualisieren
+            localStorage.setItem('familyContacts', JSON.stringify(contacts));
+            closeModal('contactModal');
+            renderContacts();
+        }
+
+        function openContactModal(contact = null) {
+            if(contact) {
+                currentEditContactId = contact.id;
+                document.getElementById('inpName').value = contact.name;
+                document.getElementById('inpRel').value = contact.rel;
+                document.getElementById('inpPhone').value = contact.phone;
+                document.getElementById('inpAddr').value = contact.addr;
+                document.getElementById('inpBday').value = contact.bday;
+                const fav = document.getElementById('favToggle');
+                if(contact.isFav) fav.classList.add('active'); else fav.classList.remove('active');
+            } else {
+                currentEditContactId = null;
+                document.querySelectorAll('#contactModal input').forEach(i => i.value = '');
+                document.getElementById('favToggle').classList.remove('active');
+            }
+            const modal = document.getElementById('contactModal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
         }
 
         // --- RENDERERS ---
@@ -962,7 +1026,40 @@
         }
         function getDaysUntil(dateString) { const today = new Date(); today.setHours(0,0,0,0); const [y, m, d] = dateString.split('-').map(Number); let bday = new Date(today.getFullYear(), m - 1, d); if (bday < today) { bday.setFullYear(today.getFullYear() + 1); } const diffTime = bday - today; return Math.ceil(diffTime / (1000 * 60 * 60 * 24)); }
         function saveFilter() { localStorage.setItem('trashFilter', document.getElementById('filterInput').value); }
-        function importIcs(e) { const file = e.target.files[0]; if(!file) return; const filterStr = document.getElementById('filterInput').value || ""; const filterList = filterStr.toLowerCase().split(',').map(s=>s.trim()).filter(s=>s!==""); const reader = new FileReader(); reader.onload = function(f) { const lines = f.target.result.split(/\r?\n/); let events = [], cur = null; lines.forEach(l => { if(l.startsWith('BEGIN:VEVENT')) cur = {}; else if(l.startsWith('SUMMARY:')) cur.s = l.replace('SUMMARY:','').trim(); else if(l.startsWith('DTSTART')) { const match = l.match(/(\d{8})/); if(match) cur.d = match[1]; } else if(l.startsWith('END:VEVENT') && cur && cur.s && cur.d) { const sLow = cur.s.toLowerCase(); if((/müll|abfuhr|tonne|papier|gelb|bio/.test(sLow)) && !filterList.some(b => sLow.includes(b))) events.push(cur); } }); if(events.length>0) { db.ref('trashData').set(events.sort((a,b)=>a.d.localeCompare(b.d))); alert("Importiert!"); } }; reader.readAsText(file); }
+        
+        // --- REPARIERTE IMPORT ICS FUNKTION ---
+        function importIcs(e) { 
+            const file = e.target.files[0]; 
+            if(!file) return; 
+            
+            const reader = new FileReader(); 
+            reader.onload = function(f) { 
+                const lines = f.target.result.split(/\r?\n/); 
+                let events = [], cur = null; 
+                lines.forEach(l => { 
+                    if(l.startsWith('BEGIN:VEVENT')) cur = {}; 
+                    else if(l.startsWith('SUMMARY:')) cur.s = l.replace('SUMMARY:','').trim(); 
+                    else if(l.startsWith('DTSTART')) { 
+                        const match = l.match(/(\d{8})/); 
+                        if(match) cur.d = match[1]; 
+                    } 
+                    else if(l.startsWith('END:VEVENT') && cur && cur.s && cur.d) { 
+                        const sLow = cur.s.toLowerCase();
+                        if(/müll|abfuhr|tonne|papier|gelb|bio|rest/.test(sLow)) events.push(cur); 
+                    } 
+                }); 
+                
+                if(events.length > 0) { 
+                    db.ref('trashData').set(events)
+                        .then(() => alert(events.length + " Mülltermine importiert!"))
+                        .catch(err => alert("Importfehler: " + err.message));
+                } else {
+                    alert("Keine passenden Termine in der Datei gefunden.");
+                }
+            }; 
+            reader.readAsText(file); 
+        }
+        
         function triggerConfetti() { var duration = 3 * 1000; var animationEnd = Date.now() + duration; var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 6000 }; function randomInOut(min, max) { return Math.random() * (max - min) + min; } var interval = setInterval(function() { var timeLeft = animationEnd - Date.now(); if (timeLeft <= 0) { return clearInterval(interval); } var particleCount = 50 * (timeLeft / duration); confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.1, 0.3), y: Math.random() - 0.2 } })); confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInOut(0.7, 0.9), y: Math.random() - 0.2 } })); }, 250); }
         function triggerFireworks() { var duration = 5 * 1000; var animationEnd = Date.now() + duration; var interval = setInterval(function() { var timeLeft = animationEnd - Date.now(); if (timeLeft <= 0) return clearInterval(interval); var randomX = Math.random(); var randomY = Math.random() * 0.5; confetti({ particleCount: 100, startVelocity: 30, spread: 360, origin: { x: randomX, y: randomY }, zIndex: 6000, colors: ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff'] }); }, 800); }
         function closeVideo() { document.getElementById('videoOverlay').style.display = 'none'; document.getElementById('rewardVideo').pause(); }
