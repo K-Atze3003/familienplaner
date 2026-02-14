@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="de">
-<head> 
+<head>
     <meta charset="UTF-8">
-    <meta name="robots" content="noindex, nofollow">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -180,11 +179,15 @@
         /* Bauplaner Extras */
         #constructionExtras { display: none; width: 100%; margin-top: 10px; padding-top:10px; border-top: 1px solid #f0f0f0; }
         #constructionExtras.show { display: block; }
+        
+        /* Debug Info */
+        #connectionStatus { position: fixed; top: 0; left:0; width:100%; padding: 5px; text-align:center; font-size:10px; z-index:10000; display:none; }
     </style>
 </head>
 <body>
     
     <div id="loading" class="loading-screen"><i class="fas fa-spinner fa-spin"></i> Lade FamilyHub...</div>
+    <div id="connectionStatus"></div>
 
     <audio id="snd-0" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio> 
     <audio id="snd-1" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio> 
@@ -207,7 +210,7 @@
                 <span class="label">Abendessen</span>
             </div>
             <div class="card" onclick="toggleRoutineTask('marlene', 1)">
-                <img src="Geschirr.png" class="icon-img" alt="Geschirr">
+                <img src="xxx.png" class="icon-img" alt="Geschirr">
                 <span class="label">Geschirr</span>
             </div>
             <div class="card" onclick="toggleRoutineTask('marlene', 2)">
@@ -231,7 +234,7 @@
                 <span class="label">Haarekämmen</span>
             </div>
             <div class="card" onclick="toggleRoutineTask('marlene', 7)">
-                <img src="Toilette.png" class="icon-img" alt="Toilette">
+                <img src="xxx.png" class="icon-img" alt="Toilette">
                 <span class="label">Toilette</span>
             </div>
             <div class="card" onclick="toggleRoutineTask('marlene', 8)">
@@ -255,7 +258,7 @@
                 <span class="label">Abendessen</span>
             </div>
              <div class="card" onclick="toggleRoutineTask('linda', 1)">
-                <img src="Geschirr.png" class="icon-img" alt="Geschirr">
+                <img src="xxx.png" class="icon-img" alt="Geschirr">
                 <span class="label">Geschirr</span>
             </div>
             <div class="card" onclick="toggleRoutineTask('linda', 2)">
@@ -279,7 +282,7 @@
                 <span class="label">Haarekämmen</span>
             </div>
              <div class="card" onclick="toggleRoutineTask('linda', 7)">
-                <img src="Toilette.png" class="icon-img" alt="Toilette">
+                <img src="xxx.png" class="icon-img" alt="Toilette">
                 <span class="label">Toilette</span>
             </div>
             <div class="card" onclick="toggleRoutineTask('linda', 8)">
@@ -481,6 +484,8 @@
             apiKey: "AIzaSyB6gusTv4l6gQDK3EkU01hLCgX9EgVJrJQ",
             authDomain: "familyhub-e00ez41008068e19zz.firebaseapp.com",
             projectId: "familyhub-e00ez41008068e19zz",
+            
+            // WICHTIG: Die exakte URL für Europa!
             databaseURL: "https://familyhub-e00ez41008068e19zz-default-rtdb.europe-west1.firebasedatabase.app/",
             storageBucket: "familyhub-e00ez41008068e19zz.firebasestorage.app",
             messagingSenderId: "677777476532",
@@ -489,22 +494,47 @@
         };
         // --- KONFIGURATION ENDE ---
 
-        // Firebase initialisieren
-        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-        // WICHTIG: Explizite URL-Übergabe für Region Europe-West1
-        const db = firebase.database("https://familyhub-e00ez41008068e19zz-default-rtdb.europe-west1.firebasedatabase.app/");
+        let db;
+        
+        try {
+            if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+            // Verbindung herstellen mit der korrekten URL
+            db = firebase.database("https://familyhub-e00ez41008068e19zz-default-rtdb.europe-west1.firebasedatabase.app/");
+        } catch(e) {
+            alert("Firebase Fehler: " + e.message);
+        }
 
         let globalPin = "0000"; 
         let currentEditContactId = null;
         let currentEditTaskId = null;
         let firebaseTasks = []; 
         let firebaseTrash = [];
-        // WICHTIG: Standardwerte setzen, damit es nicht leer ist
         let firebaseRoutine = { marlene: [], linda: [] };
         let isTimeOverrideActive = false; 
 
         window.onload = function() {
-            document.getElementById('loading').style.display = 'none';
+            // NOTAUS: Ladebildschirm nach 2 Sekunden auf jeden Fall ausblenden
+            setTimeout(function() {
+                const l = document.getElementById('loading');
+                if(l) l.style.display = 'none';
+            }, 2000);
+
+            // Verbindungs-Check
+            const statusEl = document.getElementById('connectionStatus');
+            db.ref('.info/connected').on('value', function(snap) {
+                if (snap.val() === true) {
+                    statusEl.style.display = 'block';
+                    statusEl.style.backgroundColor = '#4cd964';
+                    statusEl.style.color = 'white';
+                    statusEl.innerHTML = "✅ Verbunden";
+                    setTimeout(() => statusEl.style.display = 'none', 3000);
+                } else {
+                    statusEl.style.display = 'block';
+                    statusEl.style.backgroundColor = '#ff3b30';
+                    statusEl.style.color = 'white';
+                    statusEl.innerHTML = "❌ Nicht verbunden (Prüfe Internet/URL)";
+                }
+            });
 
             // PIN laden
             db.ref('settings/pin').on('value', (snap) => { globalPin = snap.val() || "0000"; });
@@ -589,7 +619,6 @@
 
             // 2. Berechnung der neuen Liste
             const todayStr = new Date().toISOString().split('T')[0];
-            // Sicherheitsabfrage, falls firebaseRoutine noch undefined ist
             let currentList = (firebaseRoutine && firebaseRoutine[person]) ? [...firebaseRoutine[person]] : [];
             
             if(currentList.includes(index)) {
@@ -604,7 +633,6 @@
             }
 
             // 3. OPTIMISTISCHES UPDATE (Sofort anzeigen, nicht warten)
-            // Wir updaten die globale Variable und die UI sofort
             if(!firebaseRoutine) firebaseRoutine = {};
             firebaseRoutine[person] = currentList;
             
@@ -615,7 +643,6 @@
             db.ref(`routines/${todayStr}/${person}`).set(currentList)
               .catch(error => {
                   alert("Fehler beim Speichern: " + error.message);
-                  console.error(error);
               });
         }
 
@@ -780,7 +807,6 @@
             setTimeout(() => modal.classList.add('active'), 10);
         }
 
-        // --- REPARIERTE SAVE TASK FUNKTION MIT FEEDBACK ---
         function saveTask() {
             const title = document.getElementById('taskTitle').value.trim();
             if(!title) return;
