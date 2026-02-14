@@ -2,215 +2,105 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FamilyHub Diagnose</title>
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimal Test</title>
+
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    
+
     <style>
-        /* DIAGNOSE BOX STYLE */
-        #debugConsole {
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 150px;
-            background: black; color: #0f0; font-family: monospace; font-size: 12px;
-            overflow-y: scroll; z-index: 10000; padding: 10px; border-top: 2px solid #0f0;
-            display: block; /* Immer sichtbar für Diagnose */
-        }
-
-        :root { --bg-color: #f0f2f5; --primary-blue: #007aff; }
-        body { font-family: -apple-system, sans-serif; background-color: var(--bg-color); margin: 0; padding-bottom: 160px; } /* Extra Platz für Konsole */
-        
-        section { display: none; padding: 20px; flex-direction: column; align-items: center; }
-        section.active { display: flex; }
-        
-        .card { background: white; border-radius: 15px; padding: 15px; margin-bottom: 10px; width: 100%; box-shadow: 0 2px 5px rgba(0,0,0,0.05); box-sizing: border-box; }
-        
-        .tab-bar { position: fixed; bottom: 150px; /* Über der Konsole */ width: 100%; height: 60px; background: white; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #ccc; z-index: 9000; }
-        .tab-item { font-size: 20px; color: #999; padding: 10px; }
-        .tab-item.active { color: var(--primary-blue); }
-
-        .fab { position: fixed; bottom: 220px; right: 20px; background: var(--primary-blue); color: white; width: 50px; height: 50px; border-radius: 25px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 9000; }
-
-        /* Modal */
-        .modal-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9500; display:none; align-items:center; justify-content:center; }
-        .modal-sheet { background: white; width: 90%; padding: 20px; border-radius: 15px; }
-        .modal-overlay.active { display: flex; }
-        input { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        body { font-family: sans-serif; padding: 20px; }
+        button { padding: 15px; font-size: 20px; background: lime; display: block; margin: 10px 0; width: 100%; }
+        input { padding: 10px; font-size: 18px; width: 100%; margin-bottom: 10px; }
+        #log { background: #eee; padding: 10px; border: 1px solid #333; height: 300px; overflow: scroll; font-family: monospace; }
+        .error { color: red; font-weight: bold; }
+        .success { color: green; font-weight: bold; }
     </style>
 </head>
 <body>
+
+    <h1>🔥 Datenbank Test</h1>
     
-    <div id="debugConsole">Start Diagnose...<br></div>
+    <p>1. Gib einen Text ein:</p>
+    <input type="text" id="testInput" placeholder="Hallo Welt">
+    
+    <p>2. Drücke den Knopf:</p>
+    <button onclick="runTest()">TEST SPEICHERN</button>
+
+    <p>3. Protokoll:</p>
+    <div id="log">Warte auf Start...<br></div>
 
     <script>
-        // Eigener Logger für den Bildschirm
-        function log(msg) {
-            const c = document.getElementById('debugConsole');
-            const time = new Date().toLocaleTimeString();
-            c.innerHTML += `[${time}] ${msg}<br>`;
-            c.scrollTop = c.scrollHeight;
+        // Logger Funktion
+        function log(msg, type="") {
+            const el = document.getElementById('log');
+            const color = type === 'err' ? 'red' : (type === 'ok' ? 'green' : 'black');
+            el.innerHTML += `<span style="color:${color}">[${new Date().toLocaleTimeString()}] ${msg}</span><br>`;
             console.log(msg);
         }
-        window.onerror = function(msg, url, line) {
-            log("❌ ERROR: " + msg + " (Zeile " + line + ")");
-            return false;
-        };
-    </script>
 
-    <section id="tasks" class="active">
-        <h1>Aufgaben Test</h1>
-        <div id="taskList"></div>
-        <button class="fab" onclick="openTaskModal()">+</button>
-    </section>
-
-    <section id="settings">
-        <h1>Einstellungen</h1>
-        <div class="card">
-            <strong>Sicherheit PIN</strong>
-            <input type="password" id="newPinInput" placeholder="Neuer PIN">
-            <button onclick="changeGlobalPin()" style="width:100%; padding:10px; background:#007aff; color:white; border:none; border-radius:5px;">PIN ändern</button>
-        </div>
-    </section>
-
-    <nav class="tab-bar">
-        <div class="tab-item active" onclick="showTab('tasks', this)"><i class="fas fa-check"></i></div>
-        <div class="tab-item" onclick="showTab('settings', this)"><i class="fas fa-cog"></i></div>
-    </nav>
-
-    <div id="taskModal" class="modal-overlay">
-        <div class="modal-sheet">
-            <h3>Neue Aufgabe</h3>
-            <input type="text" id="taskTitle" placeholder="Titel">
-            <button onclick="saveTask()" style="width:100%; padding:10px; background:#34c759; color:white; border:none; border-radius:5px;">Speichern</button>
-            <button onclick="closeModal()" style="width:100%; padding:10px; background:#ccc; margin-top:10px; border:none; border-radius:5px;">Abbrechen</button>
-        </div>
-    </div>
-
-    <script>
+        // --- KONFIGURATION ---
         const firebaseConfig = {
             apiKey: "AIzaSyB6gusTv4l6gQDK3EkU01hLCgX9EgVJrJQ",
             authDomain: "familyhub-e00ez41008068e19zz.firebaseapp.com",
             projectId: "familyhub-e00ez41008068e19zz",
-            databaseURL: "https://familyhub-e00ez41008068e19zz-default-rtdb.europe-west1.firebasedatabase.app/", 
-            storageBucket: "familyhub-e00ez41008068e19zz.firebasestorage.app",
-            messagingSenderId: "677777476532",
-            appId: "1:677777476532:web:2568ffdc95dfda387980e1",
-            measurementId: "G-FJRZVYTF49"
+            // WICHTIG: Die URL
+            databaseURL: "https://familyhub-e00ez41008068e19zz-default-rtdb.europe-west1.firebasedatabase.app/",
+            appId: "1:677777476532:web:2568ffdc95dfda387980e1"
         };
 
         let db;
-        let firebaseTasks = [];
-        let globalPin = "0000";
 
+        // Startversuch
         try {
-            if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-            db = firebase.database(firebaseConfig.databaseURL);
-            log("Firebase initialisiert.");
-        } catch(e) {
-            log("KRITISCH: Firebase Init fehlgeschlagen: " + e.message);
-        }
+            log("Starte Firebase...");
+            if (!firebase.apps.length) { 
+                firebase.initializeApp(firebaseConfig); 
+                log("Firebase App initialisiert.");
+            }
+            db = firebase.database();
+            log("Datenbank-Referenz erstellt.", "ok");
 
-        window.onload = function() {
-            log("Seite geladen. Prüfe Verbindung...");
-            
+            // Verbindungstest
             db.ref(".info/connected").on("value", function(snap) {
                 if (snap.val() === true) {
-                    log("✅ ONLINE: Verbunden mit Datenbank!");
+                    log("✅ ONLINE! Verbunden mit Server.", "ok");
                 } else {
-                    log("⚠️ OFFLINE: Nicht verbunden.");
+                    log("⚠️ OFFLINE. Suche Verbindung...");
                 }
             });
 
-            // Aufgaben laden
-            db.ref('familyTasks').on('value', (snap) => {
-                const val = snap.val();
-                log("Daten empfangen (Aufgaben).");
+        } catch (e) {
+            log("❌ KRITISCHER START-FEHLER: " + e.message, "err");
+            alert("Fehler: " + e.message);
+        }
+
+        // Die Test-Funktion
+        function runTest() {
+            const val = document.getElementById('testInput').value || "Test-Eintrag";
+            log(`Versuche "${val}" zu speichern...`);
+
+            // Wir schreiben in einen Test-Pfad
+            db.ref('test_verbindung').set({
+                nachricht: val,
+                zeit: new Date().toString()
+            })
+            .then(() => {
+                log("🎉 GESPEICHERT! Es funktioniert!", "ok");
+                alert("Erfolg! Die Datenbank funktioniert.");
+            })
+            .catch((error) => {
+                log("❌ FEHLER BEIM SPEICHERN:", "err");
+                log(error.message, "err");
+                log("Code: " + error.code, "err");
                 
-                // SICHERE KONVERTIERUNG (Der Fix für den Absturz)
-                if (Array.isArray(val)) {
-                    firebaseTasks = val;
-                } else if (val && typeof val === 'object') {
-                    // Falls Firebase ein Objekt statt Array schickt
-                    firebaseTasks = Object.values(val);
-                    log("Info: Daten waren Objekt, konvertiert zu Array.");
+                if(error.code === "PERMISSION_DENIED") {
+                    alert("Zugriff verweigert! Die Regeln stehen auf 'false'.");
                 } else {
-                    firebaseTasks = [];
-                }
-                
-                renderTasks();
-            }, (error) => {
-                log("❌ LESE-FEHLER: " + error.message);
-                log("Code: " + error.code);
-            });
-
-            // PIN laden
-            db.ref('settings/pin').on('value', (snap) => {
-                globalPin = snap.val() || "0000";
-                log("PIN geladen: " + globalPin);
-            }, (error) => {
-                log("❌ PIN LESE-FEHLER: " + error.message);
-            });
-        };
-
-        function saveTask() {
-            const title = document.getElementById('taskTitle').value;
-            if(!title) { log("Titel fehlt!"); return; }
-
-            log("Starte Speichern...");
-
-            const newTask = {
-                id: Date.now(),
-                title: title,
-                done: false
-            };
-
-            // Liste sicher kopieren
-            let newTaskList = [...firebaseTasks];
-            newTaskList.push(newTask);
-
-            log("Sende an DB...");
-            
-            db.ref('familyTasks').set(newTaskList)
-                .then(() => {
-                    log("✅ SPEICHERN ERFOLGREICH!");
-                    closeModal();
-                    document.getElementById('taskTitle').value = "";
-                })
-                .catch((error) => {
-                    log("❌ SPEICHER-FEHLER: " + error.message);
                     alert("Fehler: " + error.message);
-                });
-        }
-
-        function changeGlobalPin() {
-            const val = document.getElementById('newPinInput').value;
-            log("Versuche PIN zu ändern...");
-            db.ref('settings/pin').set(val)
-                .then(() => log("✅ PIN GEÄNDERT!"))
-                .catch(e => log("❌ PIN FEHLER: " + e.message));
-        }
-
-        function renderTasks() {
-            const list = document.getElementById('taskList');
-            list.innerHTML = "";
-            firebaseTasks.forEach(t => {
-                list.innerHTML += `<div class="card">${t.title}</div>`;
+                }
             });
-            log("Liste aktualisiert: " + firebaseTasks.length + " Einträge.");
         }
-
-        function showTab(id, el) {
-            document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-            el.classList.add('active');
-        }
-
-        function openTaskModal() { document.getElementById('taskModal').classList.add('active'); }
-        function closeModal() { document.getElementById('taskModal').classList.remove('active'); }
     </script>
 </body>
 </html>
