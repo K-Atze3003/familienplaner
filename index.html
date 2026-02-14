@@ -488,6 +488,7 @@
         };
         // --- KONFIGURATION ENDE ---
 
+        // Firebase initialisieren
         if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
         const db = firebase.database();
 
@@ -496,32 +497,44 @@
         let currentEditTaskId = null;
         let firebaseTasks = []; 
         let firebaseTrash = [];
+        // WICHTIG: Standardwerte setzen, damit es nicht leer ist
         let firebaseRoutine = { marlene: [], linda: [] };
-        let isTimeOverrideActive = false; // Status für PIN-Override heute
+        let isTimeOverrideActive = false; 
 
         window.onload = function() {
             document.getElementById('loading').style.display = 'none';
 
+            // PIN laden
             db.ref('settings/pin').on('value', (snap) => { globalPin = snap.val() || "0000"; });
+            
+            // Aufgaben laden
             db.ref('familyTasks').on('value', (snap) => {
                 firebaseTasks = snap.val() || [];
                 if(document.querySelector('#tasks.active')) renderTasks();
                 if(document.querySelector('#construction.active')) renderConstruction();
                 if(document.querySelector('#weekly.active')) renderWeekly();
             });
+            
+            // Müll laden
             db.ref('trashData').on('value', (snap) => {
                 firebaseTrash = snap.val() || [];
                 if(document.querySelector('#calendar.active')) renderTrash();
                 if(document.querySelector('#weekly.active')) renderWeekly();
             });
+
+            // Routinen laden (Der Listener, der die UI updated)
             const todayStr = new Date().toISOString().split('T')[0];
             db.ref('routines/' + todayStr).on('value', (snap) => {
                 const data = snap.val() || { marlene: [], linda: [] };
-                firebaseRoutine = data;
+                firebaseRoutine = data; // Globale Variable updaten
+                
+                // UI Aktualisieren
                 updateRoutineUI('routineMarlene', data.marlene || []);
                 updateRoutineUI('routineLinda', data.linda || []);
+                
                 checkCombinedSuccess(data);
             });
+
             if(document.querySelector('#contacts.active')) renderContacts();
         };
 
@@ -550,88 +563,117 @@
                 const newP = document.getElementById('newPinInput').value;
                 if(newP.length === 4) {
                     db.ref('settings/pin').set(newP);
-                    alert("PIN in der Cloud gespeichert!");
+                    alert("PIN gespeichert!");
                     document.getElementById('newPinInput').value = "";
                 } else alert("Muss 4 Ziffern haben.");
             } else alert("Falscher PIN");
         }
 
-        // --- ROUTINE LOGIK (WICHTIG: DIESE FUNKTIONEN FEHLTEN!) ---
+        // --- ROUTINE LOGIK (OPTIMIERT) ---
         function toggleRoutineTask(person, index) {
+            // 1. Zeitprüfung
             const h = new Date().getHours();
             const isValidTime = (h >= 17 && h < 23);
 
-            // Prüfung: Entweder Zeit passt ODER Override ist aktiv
             if(!isValidTime && !isTimeOverrideActive) {
-                const entered = prompt("Außerhalb der Zeit (17-23h). PIN für Tagesfreigabe?");
+                const entered = prompt("Außerhalb der Zeit (17-23h). PIN?");
                 if(entered === globalPin) {
                     isTimeOverrideActive = true;
-                    alert("Freigabe erteilt für heute! 🔓");
+                    alert("Freigabe erteilt! 🔓");
                 } else {
                     return; // Abbruch
                 }
             }
 
+            // 2. Berechnung der neuen Liste
             const todayStr = new Date().toISOString().split('T')[0];
-            const currentList = firebaseRoutine[person] || [];
+            // Sicherheitsabfrage, falls firebaseRoutine noch undefined ist
+            let currentList = (firebaseRoutine && firebaseRoutine[person]) ? [...firebaseRoutine[person]] : [];
+            
             if(currentList.includes(index)) {
-                const newList = currentList.filter(i => i !== index);
-                db.ref(`routines/${todayStr}/${person}`).set(newList);
+                // Entfernen
+                currentList = currentList.filter(i => i !== index);
             } else {
+                // Hinzufügen
                 currentList.push(index);
-                db.ref(`routines/${todayStr}/${person}`).set(currentList);
+                // Sound abspielen
                 const snd = document.getElementById('snd-' + index);
-                if(snd) { snd.currentTime = 0; snd.play().catch(()=>{}); }
+                if(snd) { snd.currentTime = 0; snd.play().catch(e => console.log("Audio Fehler", e)); }
             }
+
+            // 3. OPTIMISTISCHES UPDATE (Sofort anzeigen, nicht warten)
+            // Wir updaten die globale Variable und die UI sofort
+            if(!firebaseRoutine) firebaseRoutine = {};
+            firebaseRoutine[person] = currentList;
+            
+            const sectionId = person === 'marlene' ? 'routineMarlene' : 'routineLinda';
+            updateRoutineUI(sectionId, currentList); // <--- SOFORTIGE UI ÄNDERUNG
+
+            // 4. Speichern in Cloud
+            db.ref(`routines/${todayStr}/${person}`).set(currentList)
+              .catch(error => {
+                  alert("Fehler beim Speichern: " + error.message);
+                  console.error(error);
+              });
         }
 
         function updateRoutineUI(sectionId, doneList) {
             const container = document.getElementById(sectionId);
+            if(!container) return; // Sicherheit
+
             const cards = container.querySelectorAll('.card');
+            const bar = container.querySelector('.bar-fill');
+            const containerBar = container.querySelector('.progress-container');
+
+            // Karten färben
             cards.forEach((c, i) => {
                 if(doneList.includes(i)) c.classList.add('done');
                 else c.classList.remove('done');
             });
+
+            // Fortschrittsbalken
             const doneCount = doneList.length;
-            const bar = container.querySelector('.bar-fill');
-            bar.style.width = (doneCount/cards.length*100) + '%';
+            const total = cards.length; // Sollte 10 sein
+            const percentage = (doneCount / total) * 100;
+            
+            bar.style.width = percentage + '%';
+            
+            // Animation
             if(doneCount > 0) {
-                const containerBar = container.querySelector('.progress-container');
                 containerBar.classList.remove('bar-bounce');
-                void containerBar.offsetWidth;
+                void containerBar.offsetWidth; // Trigger Reflow
                 containerBar.classList.add('bar-bounce');
             }
         }
 
         let videoHasPlayedToday = false;
         function checkCombinedSuccess(data) {
-            const marleneDone = (data.marlene || []).length === 10;
-            const lindaDone = (data.linda || []).length === 10;
+            if(!data || !data.marlene || !data.linda) return;
+
+            const marleneDone = data.marlene.length === 10;
+            const lindaDone = data.linda.length === 10;
+            
             if(marleneDone && lindaDone && !videoHasPlayedToday) {
                 videoHasPlayedToday = true;
                 triggerConfetti();
                 triggerFireworks();
                 document.getElementById('videoOverlay').style.display = 'flex';
                 const videoEl = document.getElementById('rewardVideo');
-                videoEl.play();
+                videoEl.play().catch(e => console.log("Video Fehler", e));
                 document.getElementById('finalSuccess').play().catch(()=>{});
                 videoEl.onended = function() { closeVideo(); };
             }
         }
 
         function resetRoutine() {
-            if(!isTimeOverrideActive) {
-                const h = new Date().getHours();
-                if(h < 17 || h >= 23) {
-                     alert("Außerhalb Zeit. Klicke erst auf eine Karte für PIN."); return;
-                }
-            }
             if(prompt("PIN zum Reset:") === globalPin) {
                 const todayStr = new Date().toISOString().split('T')[0];
                 if(confirm("Marlene (OK) oder Linda (Abbrechen)?")) {
                     db.ref(`routines/${todayStr}/marlene`).set([]);
+                    updateRoutineUI('routineMarlene', []); // Sofort Reset UI
                 } else {
                     db.ref(`routines/${todayStr}/linda`).set([]);
+                    updateRoutineUI('routineLinda', []); // Sofort Reset UI
                 }
                 videoHasPlayedToday = false;
             } else alert("Falscher PIN");
@@ -639,7 +681,6 @@
 
         // --- BACKUP ---
         function shareBackup() {
-            // Wir müssen auch die lokalen "Hybrid" Daten sichern
             let localExtras = {};
             for(let i=0; i<localStorage.length; i++) {
                 const key = localStorage.key(i);
@@ -686,7 +727,7 @@
                     if(data.familyTasks) db.ref('familyTasks').set(data.familyTasks);
                     if(data.trashData) db.ref('trashData').set(data.trashData);
                     if(data.globalPin) db.ref('settings/pin').set(data.globalPin);
-                    alert("Daten erfolgreich eingespielt!");
+                    alert("Daten erfolgreich eingespielt! Seite lädt neu.");
                     location.reload();
                 } catch(err) { alert("Fehler Datei."); }
             };
@@ -781,7 +822,7 @@
             if(idx > -1) {
                 tasks[idx].done = !tasks[idx].done;
                 if(tasks[idx].done) {
-                    const s = document.getElementById('snd-2'); // Standard "Done" Sound
+                    const s = document.getElementById('snd-2'); 
                     if(s) { s.currentTime=0; s.play().catch(()=>{}); }
                 }
                 db.ref('familyTasks').set(tasks);
